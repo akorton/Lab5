@@ -7,6 +7,10 @@ import Lab5.jsonStaff.GsonMaster;
 import java.io.*;
 import java.util.*;
 
+/**
+ * class that contains all commands
+ * @param <T>
+ */
 public class CommandsMaster<T extends City> {
     private final Map<String, Executable<T>> commands = new HashMap<>();
     private final String DefaultPathName = File.separator.equals("/") ? "Files/OutputFile" : "src\\Lab5\\Files\\OutputFile";
@@ -15,10 +19,21 @@ public class CommandsMaster<T extends City> {
         initializeCommands();
     }
 
+    /**
+     * returns class of the command by the name of the command
+     * @param name name of the command
+     * @return class that implements Executable interface and has method execute
+     */
     public Executable<T> getCommandByName(String name) {
         return commands.get(name);
     }
 
+    /**
+     * method that ensures that command has received proper number of arguments of they are needed
+     * @param number_of_args number of arguments command needs
+     * @param args arguments that command received
+     * @return arguments if they are correct or null else
+     */
     private String[] checkArgs(int number_of_args, String... args){
         if (args.length == number_of_args) {
             return args;
@@ -33,6 +48,12 @@ public class CommandsMaster<T extends City> {
         }
     }
 
+    /**
+     * method that checks if the collection contains the element with given id
+     * @param myCollection collection of elements to search in
+     * @param id the id of the element
+     * @return element if it is in collection or null else
+     */
     private T checkIdInCollection(MyCollection<T> myCollection, String id){
         if (!Validator.validateLong(id)) {System.out.println("Wrong argument format."); return null;}
         else{
@@ -43,6 +64,9 @@ public class CommandsMaster<T extends City> {
         }
     }
 
+    /**
+     * method that initializes all the commands
+     */
     private void initializeCommands(){
         commands.put("help", (consoleInputMaster, myCollection, args) -> System.out.println("info : вывести в стандартный поток вывода информацию о коллекции (тип, дата инициализации, количество элементов и т.д.)\n" +
                 "show : вывести в стандартный поток вывода все элементы коллекции в строковом представлении\n" +
@@ -79,9 +103,8 @@ public class CommandsMaster<T extends City> {
             String arg = args[0];
             T city = checkIdInCollection(myCollection, arg);
             if (city == null) {return;}
-            T newCity = InputMaster.inputCity((T) new City(city.getId()));
+            T newCity = InputMaster.inputCity(city);
             if (newCity != null){
-                myCollection.set(myCollection.indexOf(city), newCity);
                 System.out.println("Successfully updated.");
             }
         });

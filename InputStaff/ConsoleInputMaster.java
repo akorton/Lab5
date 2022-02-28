@@ -7,6 +7,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * class that operates all the input from console
+ * @param <T>
+ */
 public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
     private final Scanner scanner;
     private boolean isRunning = true;
@@ -20,6 +24,10 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
         this.myCollection = myCollection;
     }
 
+    /**
+     * overrides the method from InputMaster class
+     * the main method that runs the input
+     */
     public void run(){
         System.out.println("help : вывести справку по доступным командам");
         while (isRunning) {
@@ -28,6 +36,11 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
         }
     }
 
+    /**
+     * method that inputs City object and returns it
+     * @param curCity the City to set all the fields
+     * @return T object with all inputted and validated fields
+     */
     public T inputCity(City curCity){
         System.out.println("Entering City...");
 
@@ -74,10 +87,22 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
         return (T) curCity;
     }
 
+    /**
+     * invokes another inputCity method with new City object
+     * @return T object
+     */
     public T inputCity(){
         return inputCity(new City());
     }
 
+    /**
+     * method that validates the given input String using the given validating function
+     * @param name name of the field
+     * @param validator validating function
+     * @param isEnum true if the field is Enum value false otherwise
+     * @param enumValues null if the field is enum else contains the values of the Enum
+     * @return value of the field converted to String
+     */
     private String validateInput(String name, Validatable validator, boolean isEnum, Enum[] enumValues){
         String standartOutput;
         if (!isEnum) standartOutput = "Enter " + name + ": ";
@@ -99,10 +124,20 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
         return s;
     }
 
+    /**
+     * basic validate Input function if the field is not enum
+     * @param name name of the field
+     * @param validator function to validate String
+     * @return field converted to String
+     */
     private String validateInput(String name, Validatable validator){
         return validateInput(name, validator, false, null);
     }
 
+    /**
+     * method that executes given command
+     * @param cur_str string that contains command name and its arguments separated with the space character
+     */
     private void executeCmd(String cur_str){
         try {
             String[] curLine = cur_str.split(" ");
@@ -120,10 +155,17 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
         }
     }
 
+    /**
+     * method that returns the current stack of files, program is executing
+     * @return ArrayList of files names
+     */
     public ArrayList<String> getFilesStack(){
         return filesStack;
     }
 
+    /**
+     * method that stops the main loop in run method
+     */
     public void exit(){
         this.isRunning = false;
     }

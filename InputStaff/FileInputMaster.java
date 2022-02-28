@@ -7,6 +7,10 @@ import java.io.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+/**
+ * class that operates all the File input processes
+ * @param <T>
+ */
 public class FileInputMaster<T extends City> extends InputMaster<T>{
     private InputMaster<T> inputMaster;
     private CommandsMaster<T> myCommands;
@@ -30,6 +34,10 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
         this.path = path;
     }
 
+    /**
+     * reads the file and executes all the commands
+     * @throws RecursionInFileException when recursion in file appears
+     */
     public void run() throws RecursionInFileException {
         try {
             File file = new File(path);
@@ -55,6 +63,11 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
         }
     }
 
+    /**
+     * executes currect command with the arguments if possible
+     * @param cur_str string of command name and arguments
+     * @throws RecursionInFileException thrown if the recursion in file is spotted
+     */
     private void executeCmd(String cur_str) throws RecursionInFileException {
         try {
             String[] curLine = cur_str.split(" ");
@@ -70,6 +83,11 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
         }
     }
 
+    /**
+     * helps to input a line
+     * @return line
+     * @throws IOException thrown if it is not possible to read from the file
+     */
     private String inputLine() throws IOException{
         String curStr = "";
         int cur = inputStreamReader.read();
@@ -86,6 +104,10 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
         return curStr;
     }
 
+    /**
+     * helps to input all the file (to parse it from json for example)
+     * @return file in string representation
+     */
     public String inputFile(){
         try{
             File file = new File(path);
@@ -108,6 +130,11 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
         }
     }
 
+    /**
+     * helps to input the city
+     * @param city object fields of which would be modified
+     * @return T object
+     */
     public T inputCity(T city){
         try{
             String name = inputLine();
@@ -182,15 +209,26 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
         return (T) city;
     }
 
+    /**
+     * method that returns the current stack of files, program is executing
+     * @return ArrayList of files names
+     */
     public ArrayList<String> getFilesStack(){
         return inputMaster.getFilesStack();
     }
 
+    /**
+     * stops the loop in run
+     * @param exitInputMasterAlso if true invokes exit method in the inputMaster also
+     */
     public void exit(boolean exitInputMasterAlso){
         isRunning = false;
         if (inputMaster != null && exitInputMasterAlso) inputMaster.exit();
     }
 
+    /**
+     * default representation of exit with exitInputMasterAlso = true
+     */
     public void exit(){
         exit(true);
     }

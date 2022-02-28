@@ -10,12 +10,20 @@ import com.google.gson.reflect.TypeToken;
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
 
+/**
+ * class to serialize and deserialize data to and from json
+ */
 public class GsonMaster {
 
     public GsonMaster(){
 
     }
 
+    /**
+     * deserialize data from json
+     * @param sysVariableName name of the file
+     * @return collection build from json data
+     */
     public LinkedList<City> deserialize(String sysVariableName){
         try {
             GsonBuilder gsonBuilder = new GsonBuilder();
@@ -37,6 +45,11 @@ public class GsonMaster {
         }
     }
 
+    /**
+     * makes json from Object
+     * @param o object to convert to json
+     * @return json text
+     */
     public String serialize(Object o){
         try {
             GsonBuilder gsonBuilder = new GsonBuilder()

@@ -18,6 +18,10 @@ public class Lab5 {
         consoleInputMaster.run();
     }
 
+    /**
+     * Is invoked in the start of the program and get the initial information about the collection from file.
+     * @return the initial state of the collection
+     */
     private static LinkedList<City> setUp(){
         LinkedList<City> cities = new GsonMaster().deserialize(variableName);
         return cities != null ? cities : new LinkedList<>();

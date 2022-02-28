@@ -5,6 +5,9 @@ import com.google.gson.*;
 
 import java.lang.reflect.Type;
 
+/**
+ * serialize and deserialize Coordinates class
+ */
 public class JsonCoordinates implements JsonSerializer<Coordinates>, JsonDeserializer<Coordinates> {
 
     public JsonElement serialize(Coordinates coordinates, Type type, JsonSerializationContext context){

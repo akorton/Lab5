@@ -6,6 +6,9 @@ import com.google.gson.*;
 import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
 
+/**
+ * serialize and deserialize City class
+ */
 public class JsonCity implements JsonSerializer<City>, JsonDeserializer<City> {
 
     public JsonObject serialize(City city, Type type, JsonSerializationContext context){

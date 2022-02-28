@@ -6,6 +6,9 @@ import com.google.gson.*;
 import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
 
+/**
+ * serialize and deserialize Human class
+ */
 public class JsonHuman implements JsonSerializer<Human>, JsonDeserializer<Human> {
 
     public JsonObject serialize(Human human, Type type, JsonSerializationContext context){
