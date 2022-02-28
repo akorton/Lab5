@@ -9,6 +9,10 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+/**
+ * main class of the project
+ * just start it..
+ */
 public class Lab5 {
     private static final String variableName = "JAVA_PROJECT";
 
