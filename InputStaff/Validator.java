@@ -22,7 +22,7 @@ public class Validator {
      * @return true if the name was correct false otherwise
      */
     public static boolean validateName(String name){
-        return name != null && !name.isBlank();
+        return name != null && !(name.lastIndexOf(" ") == name.length() - 1);
     }
 
     /**
