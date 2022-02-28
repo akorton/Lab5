@@ -7,6 +7,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+/**
+ * class that encapsulates all the operations upon the collection
+ * @param <T>
+ */
 public class MyCollection<T extends City> {
     private static Long cur_id = 1L;
     private LinkedList<T> myCollection = new LinkedList<>();
@@ -44,24 +48,43 @@ public class MyCollection<T extends City> {
         return getSize() > 0 ? myCollection.getLast() : null;
     }
 
+    /**
+     * clears collection
+     */
     public void clearCollection(){
         myCollection.clear();
     }
 
+    /**
+     * removes last element of the collection
+     * @return true if the element was removed else false
+     */
     public boolean removeLast(){
         int size = getSize();
         if (size > 0) myCollection.removeLast();
         return size > 0;
     }
 
+    /**
+     * @return the copy of the collection
+     */
     public LinkedList<T> getMyCollection(){
         return new LinkedList<T>(myCollection);
     }
 
+    /**
+     * adds element to the collection
+     * @param city element to add
+     */
     public void addLast(T city){
         myCollection.addLast(city);
     }
 
+    /**
+     * check if the element with id is in collection
+     * @param id id to check
+     * @return element ef it is in collection else null
+     */
     public T containsId(Long id){
         for (T city: myCollection){
             if (city.getId().equals(id)){
@@ -71,18 +94,17 @@ public class MyCollection<T extends City> {
         return null;
     }
 
+    /**
+     * removes the given element from collection
+     * @param city element to remove
+     */
     public void removeCity(T city){
         myCollection.remove(city);
     }
 
-    public int indexOf(T city){
-        return myCollection.indexOf(city);
-    }
-
-    public void set(int index, T city){
-        myCollection.set(index, city);
-    }
-
+    /**
+     * changes the order od the elements in collection
+     */
     public void reorder(){
         LinkedList<T> newCollection = new LinkedList<>();
         for (Iterator<T> it = myCollection.descendingIterator();it.hasNext();){
@@ -91,8 +113,16 @@ public class MyCollection<T extends City> {
         myCollection = newCollection;
     }
 
+    /**
+     * removes all given elements
+     * @param cities elements hto remove
+     */
     public void removeAll(Collection<T> cities) {myCollection.removeAll(cities);}
 
+    /**
+     * generates id for the next element
+     * @return id
+     */
     public static Long generateNextId(){
         return cur_id++;
     }
