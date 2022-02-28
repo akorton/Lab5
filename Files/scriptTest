@@ -1,0 +1,27 @@
+add
+Tyumen
+12
+21
+1001
+1231
+1003
+1004
+STEPPE
+HIGH
+12
+2003-05-30
+add
+Munhen
+123
+123
+10000
+20000
+20000
+3000
+MEDITERRANIAN
+ULTRA_HIGH
+50
+1980-04-03
+save
+exit
+execute_script src\Lab5\Files\scriptTest
