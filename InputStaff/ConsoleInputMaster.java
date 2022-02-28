@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ConsoleInputMaster<T extends City> {
+public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
     private final Scanner scanner;
     private boolean isRunning = true;
     private final CommandsMaster<T> myCommands;
@@ -16,7 +16,7 @@ public class ConsoleInputMaster<T extends City> {
 
     public ConsoleInputMaster(Scanner scanner, MyCollection<T> myCollection){
         this.scanner = scanner;
-        this.myCommands = new CommandsMaster<T>();
+        this.myCommands = new CommandsMaster<>();
         this.myCollection = myCollection;
     }
 
@@ -107,7 +107,7 @@ public class ConsoleInputMaster<T extends City> {
         try {
             String[] curLine = cur_str.split(" ");
             String curCmd = curLine[0];
-            ConsoleExecutable<T> curConsoleExecutable = myCommands.getCommandByName(curCmd);
+            Executable<T> curConsoleExecutable = myCommands.getCommandByName(curCmd);
             String[] args = new String[curLine.length - 1];
             for (int i = 0; i < curLine.length - 1;i++){
                 args[i] = curLine[i+1];

@@ -19,22 +19,22 @@
     }
   },
   {
-    "id": 2,
-    "name": "Munhen",
+    "id": 3,
+    "name": "Tyumen",
     "coordinates": {
-      "X": 123.0,
-      "Y": 123.0
+      "X": 12.0,
+      "Y": 21.0
     },
-    "creationDate": "2022-02-22T03:38:24.605828500+03:00[Europe/Moscow]",
-    "area": 10000.0,
-    "population": 20000,
-    "metersAboveSeaLevel": 20000.0,
-    "agglomeration": 3000.0,
-    "climate": "MEDITERRANIAN",
-    "standartOfLiving": "ULTRA_HIGH",
+    "creationDate": "2022-02-28T17:12:13.262311600+03:00[Europe/Moscow]",
+    "area": 1001.0,
+    "population": 1231,
+    "metersAboveSeaLevel": 2000.0,
+    "agglomeration": 1004.0,
+    "climate": "STEPPE",
+    "standartOfLiving": "HIGH",
     "governor": {
-      "age": 50,
-      "birthday": "1980-04-03T00:00+03:00[Europe/Moscow]"
+      "age": 30,
+      "birthday": "2003-05-20T01:00+04:00[Europe/Moscow]"
     }
   }
 ]

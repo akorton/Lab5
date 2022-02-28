@@ -7,7 +7,7 @@ public class City implements Comparable<City> {
     private Long id;
     private String name;
     private Coordinates coordinates;
-    private java.time.ZonedDateTime creationDate;
+    private final java.time.ZonedDateTime creationDate;
     private double area;
     private Long population;
     private float metersAboveSeaLevel;

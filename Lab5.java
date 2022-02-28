@@ -13,8 +13,8 @@ public class Lab5 {
     private static final String variableName = "JAVA_PROJECT";
 
     public static void main(String... args) throws IOException {
-        MyCollection<City> myCollection = new MyCollection<City>(setUp());
-        ConsoleInputMaster<City> consoleInputMaster = new ConsoleInputMaster<City>(new Scanner(System.in), myCollection);
+        MyCollection<City> myCollection = new MyCollection<>(setUp());
+        ConsoleInputMaster<City> consoleInputMaster = new ConsoleInputMaster<>(new Scanner(System.in), myCollection);
         consoleInputMaster.run();
     }
 

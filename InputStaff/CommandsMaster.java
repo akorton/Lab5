@@ -8,21 +8,15 @@ import java.io.*;
 import java.util.*;
 
 public class CommandsMaster<T extends City> {
-    private final Map<String, ConsoleExecutable<T>> commands = new HashMap<>();
-    private final Map<String, FileExecutable<T>> fileCommands = new HashMap<>();
+    private final Map<String, Executable<T>> commands = new HashMap<>();
     private final String DefaultPathName = File.separator.equals("/") ? "Files/OutputFile" : "src\\Lab5\\Files\\OutputFile";
 
     public CommandsMaster() {
         initializeCommands();
-        initializeFileCommands();
     }
 
-    public ConsoleExecutable<T> getCommandByName(String name) {
+    public Executable<T> getCommandByName(String name) {
         return commands.get(name);
-    }
-
-    public FileExecutable<T> getFileCommandByName(String name){
-        return fileCommands.get(name);
     }
 
     private String[] checkArgs(int number_of_args, String... args){
@@ -72,21 +66,26 @@ public class CommandsMaster<T extends City> {
                 "Size: " + myCollection.getSize() + "\n" +
                 "First element:\n" + myCollection.getFirstElement() + "\n" +
                 "Last element:\n" + myCollection.getLastElement()));
-        commands.put("add", (consoleInputMaster, myCollection, args)->{
-            myCollection.addLast(consoleInputMaster.inputCity());
+        commands.put("add", (inputMaster, myCollection, args)->{
+            T city = inputMaster.inputCity();
+            if (city != null) {
+                myCollection.addLast(city);
+            }
             System.out.println("Successfully added.");
         });
-        commands.put("update", (consoleInputMaster, myCollection, s)->{
+        commands.put("update", (InputMaster, myCollection, s)->{
             String[] args = checkArgs(1, s);
             if (args == null) {return;}
             String arg = args[0];
             T city = checkIdInCollection(myCollection, arg);
             if (city == null) {return;}
-            T newCity = consoleInputMaster.inputCity(new City(city.getId()));
-            myCollection.set(myCollection.indexOf(city), newCity);
-            System.out.println("Successfully updated.");
+            T newCity = InputMaster.inputCity((T) new City(city.getId()));
+            if (newCity != null){
+                myCollection.set(myCollection.indexOf(city), newCity);
+                System.out.println("Successfully updated.");
+            }
         });
-        commands.put("remove_by_id", (consoleInputMaster, myCollection, s)->{
+        commands.put("remove_by_id", (InputMaster, myCollection, s)->{
             String[] args = checkArgs(1, s);
             if (args == null) {return;}
             String arg = args[0];
@@ -95,11 +94,11 @@ public class CommandsMaster<T extends City> {
             myCollection.removeCity(city);
             System.out.println("Successfully removed.");
         });
-        commands.put("clear", (consoleInputMaster, myCollection, args) -> {
+        commands.put("clear", (InputMaster, myCollection, args) -> {
             myCollection.clearCollection();
             System.out.println("Collection was successfully cleared.");
         });
-        commands.put("save", (consoleInputMaster, myCollection, s)->{
+        commands.put("save", (InputMaster, myCollection, s)->{
             try{
                 String[] args = checkArgs(0, s);
                 if (args == null) return;
@@ -116,26 +115,27 @@ public class CommandsMaster<T extends City> {
                 System.out.println("Can not write in this file.");
             }
         });
-        commands.put("execute_script", (consoleInputMaster, myCollection, s)->{
+        commands.put("execute_script", (InputMaster, myCollection, s)->{
             String[] args = checkArgs(1, s);
             if (args != null) {
                 String arg = args[0];
-                FileInputMaster<T> fileInputMaster = new FileInputMaster<T>(consoleInputMaster, myCollection, arg);
-                fileInputMaster.executeScript();
+                FileInputMaster<T> fileInputMaster = new FileInputMaster<>(InputMaster, myCollection, arg);
+                fileInputMaster.run();
             }
         });
-        commands.put("remove_last", (consoleInputMaster, myCollection, args) -> System.out.println(myCollection.removeLast() ? "Last element was removed." : "There is no last element - collection is clear."));
-        commands.put("remove_greater", (consoleInputMaster, myCollection, args)->{
-            City city = consoleInputMaster.inputCity();
+        commands.put("remove_last", (InputMaster, myCollection, args) -> System.out.println(myCollection.removeLast() ? "Last element was removed." : "There is no last element - collection is clear."));
+        commands.put("remove_greater", (InputMaster, myCollection, args)->{
+            City city = InputMaster.inputCity();
+            if (city == null) return;
             ArrayList<T> citiesToRemove = new ArrayList<>();
             for (T city1: myCollection.getMyCollection()){
-                if (city.compareTo(city1) > 0) citiesToRemove.add(city1);
+                if (city1.compareTo(city) > 0) citiesToRemove.add(city1);
             }
             myCollection.removeAll(citiesToRemove);
             System.out.println("Successfully removed.");
         });
-        commands.put("reorder", (consoleInputMaster, myCollection, args)->myCollection.reorder());
-        commands.put("group_counting_by_area", (consoleInputMaster, myCollection, args)->{
+        commands.put("reorder", (InputMaster, myCollection, args)->myCollection.reorder());
+        commands.put("group_counting_by_area", (InputMaster, myCollection, args)->{
             Map<Double, Integer> groups = new HashMap<>();
             if (myCollection.getMyCollection().size() == 0) {
                 System.out.println("No elements in collection.");
@@ -172,49 +172,12 @@ public class CommandsMaster<T extends City> {
         });
         commands.put("print_descending", (consoleInputMaster, myCollection, args)->{
             LinkedList<T> cur = myCollection.getMyCollection();
+            if (cur.size() == 0) System.out.println("No elements in collection.");
             cur.sort(Comparator.reverseOrder());
             for (City city: cur){
                 System.out.println(city);
             }
         });
-    }
-
-    private void initializeFileCommands(){
-        fileCommands.put("add", (fileInputMaster, myCollection, args)->{
-            T city = fileInputMaster.inputCity();
-            if (city != null) {
-                myCollection.addLast(city);
-            }
-        });
-        fileCommands.put("update", ((fileInputMaster, myCollection, s) -> {
-            String[] args = checkArgs(1, s);
-            if (args == null) {return;}
-            String arg = args[0];
-            T city = checkIdInCollection(myCollection, arg);
-            if (city == null) {return;}
-            T newCity = fileInputMaster.inputCity(new City(city.getId()));
-            if (newCity != null){
-                myCollection.set(myCollection.indexOf(city), newCity);
-            }
-        }));
-        fileCommands.put("remove_greater", (((fileInputMaster, myCollection, args) ->{
-            T city = fileInputMaster.inputCity();
-            if (city == null) return;
-            ArrayList<T> citiesToRemove = new ArrayList<>();
-            for (T city1: myCollection.getMyCollection()){
-                if (city.compareTo(city1) > 0) citiesToRemove.add(city1);
-            }
-            myCollection.removeAll(citiesToRemove);
-        })));
-        fileCommands.put("exit", (((fileInputMaster, myCollection, args) -> {
-            fileInputMaster.exit(true);
-            commands.get("exit").execute(fileInputMaster.getConsoleInputMaster(), myCollection);
-        })));
-        for (String key: commands.keySet()){
-            if (!fileCommands.containsKey(key)){
-                fileCommands.put(key, (fileInputMaster, myCollection, args) -> commands.get(key).execute(fileInputMaster.getConsoleInputMaster(), myCollection, args));
-            }
-        }
     }
 
 }

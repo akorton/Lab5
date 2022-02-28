@@ -5,9 +5,10 @@ import Lab5.CollectionStaff.MyCollection;
 
 import java.io.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 
-public class FileInputMaster<T extends City> {
-    private ConsoleInputMaster<T> consoleInputMaster;
+public class FileInputMaster<T extends City> extends InputMaster<T>{
+    private InputMaster<T> inputMaster;
     private CommandsMaster<T> myCommands;
     private InputStreamReader inputStreamReader;
     private MyCollection<T> myCollection;
@@ -22,30 +23,30 @@ public class FileInputMaster<T extends City> {
         this.inputStreamReader = inputStreamReader;
     }
 
-    public FileInputMaster(ConsoleInputMaster<T> consoleInputMaster, MyCollection<T> myCollection, String path) {
-        this.consoleInputMaster = consoleInputMaster;
+    public FileInputMaster(InputMaster<T> inputMaster, MyCollection<T> myCollection, String path) {
+        this.inputMaster = inputMaster;
         myCommands = new CommandsMaster<T>();
         this.myCollection = myCollection;
         this.path = path;
     }
 
-    public void executeScript() throws RecursionInFileException {
+    public void run() throws RecursionInFileException {
         try {
             File file = new File(path);
             InputStreamReader reader = new FileReader(path);
             inputStreamReader = reader;
-            if (consoleInputMaster.getFilesStack().contains(file.getAbsolutePath())){
-                consoleInputMaster.getFilesStack().clear();
+            if (inputMaster.getFilesStack().contains(file.getAbsolutePath())){
+                inputMaster.getFilesStack().clear();
                 throw new RecursionInFileException();
             }
-            consoleInputMaster.getFilesStack().add(file.getAbsolutePath());
+            inputMaster.getFilesStack().add(file.getAbsolutePath());
             String curCmd = inputLine();
             while (!curCmd.isEmpty() && isRunning){
                 executeCmd(curCmd);
                 curCmd = inputLine();
             }
             reader.close();
-            consoleInputMaster.getFilesStack().remove(file.getAbsolutePath());
+            inputMaster.getFilesStack().remove(file.getAbsolutePath());
             System.out.println("Script was executed.");
         } catch (FileNotFoundException e){
             System.out.println("File not found.");
@@ -58,12 +59,12 @@ public class FileInputMaster<T extends City> {
         try {
             String[] curLine = cur_str.split(" ");
             String curCmd = curLine[0];
-            FileExecutable<T> curFileExecutable = myCommands.getFileCommandByName(curCmd);
+            Executable<T> curExecutable = myCommands.getCommandByName(curCmd);
             String[] args = new String[curLine.length - 1];
             for (int i = 0; i < curLine.length - 1; i++) {
                 args[i] = curLine[i + 1];
             }
-            curFileExecutable.execute(this, myCollection, args);
+            curExecutable.execute(this, myCollection, args);
         } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
             System.out.println("Command not found.");
         }
@@ -107,11 +108,7 @@ public class FileInputMaster<T extends City> {
         }
     }
 
-    public T inputCity() {
-        return inputCity(new City());
-    }
-
-    public T inputCity(City city){
+    public T inputCity(T city){
         try{
             String name = inputLine();
             if (!Validator.validateName(name)){
@@ -185,13 +182,13 @@ public class FileInputMaster<T extends City> {
         return (T) city;
     }
 
-    public ConsoleInputMaster<T> getConsoleInputMaster(){
-        return consoleInputMaster;
+    public ArrayList<String> getFilesStack(){
+        return inputMaster.getFilesStack();
     }
 
     public void exit(boolean exitInputMasterAlso){
         isRunning = false;
-        if (consoleInputMaster != null && exitInputMasterAlso) consoleInputMaster.exit();
+        if (inputMaster != null && exitInputMasterAlso) inputMaster.exit();
     }
 
     public void exit(){
