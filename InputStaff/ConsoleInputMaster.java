@@ -5,20 +5,22 @@ import Lab5.CollectionStaff.MyCollection;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
  * class that operates all the input from console
+ *
  * @param <T>
  */
 public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
-    private final Scanner scanner;
+    private Scanner scanner;
     private boolean isRunning = true;
     private final CommandsMaster<T> myCommands;
     private final MyCollection<T> myCollection;
     private final ArrayList<String> filesStack = new ArrayList<>();
 
-    public ConsoleInputMaster(Scanner scanner, MyCollection<T> myCollection){
+    public ConsoleInputMaster(Scanner scanner, MyCollection<T> myCollection) {
         this.scanner = scanner;
         this.myCommands = new CommandsMaster<>();
         this.myCollection = myCollection;
@@ -28,20 +30,25 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
      * overrides the method from InputMaster class
      * the main method that runs the input
      */
-    public void run(){
+    public void run() {
         System.out.println("help : вывести справку по доступным командам");
         while (isRunning) {
             System.out.print("Enter command: ");
-            executeCmd(scanner.nextLine());
+            try {
+                executeCmd(scanner.nextLine());
+            } catch (NoSuchElementException | IllegalStateException e){
+                System.out.println("Not this time.");
+            }
         }
     }
 
     /**
      * method that inputs City object and returns it
+     *
      * @param curCity the City to set all the fields
      * @return T object with all inputted and validated fields
      */
-    public T inputCity(City curCity){
+    public T inputCity(City curCity) {
         System.out.println("Entering City...");
 
         String name = validateInput("name", Validator::validateName);
@@ -89,35 +96,37 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
 
     /**
      * invokes another inputCity method with new City object
+     *
      * @return T object
      */
-    public T inputCity(){
+    public T inputCity() {
         return inputCity(new City());
     }
 
     /**
      * method that validates the given input String using the given validating function
-     * @param name name of the field
-     * @param validator validating function
-     * @param isEnum true if the field is Enum value false otherwise
+     *
+     * @param name       name of the field
+     * @param validator  validating function
+     * @param isEnum     true if the field is Enum value false otherwise
      * @param enumValues null if the field is enum else contains the values of the Enum
      * @return value of the field converted to String
      */
-    private String validateInput(String name, Validatable validator, boolean isEnum, Enum[] enumValues){
+    private String validateInput(String name, Validatable validator, boolean isEnum, Enum[] enumValues) {
         String standartOutput;
         if (!isEnum) standartOutput = "Enter " + name + ": ";
         else {
-            standartOutput = "Enter " + name +"(";
-            for (Enum en: enumValues){
+            standartOutput = "Enter " + name + "(";
+            for (Enum en : enumValues) {
                 standartOutput += en.name() + ", ";
             }
-            standartOutput = standartOutput.substring(0, standartOutput.length()-2);
+            standartOutput = standartOutput.substring(0, standartOutput.length() - 2);
             standartOutput += "): ";
         }
 
         System.out.printf(standartOutput, name);
         String s = scanner.nextLine();
-        while (!validator.validate(s)){
+        while (!validator.validate(s)) {
             System.out.printf("Incorrect %s\n%s", name, standartOutput);
             s = scanner.nextLine();
         }
@@ -126,47 +135,50 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
 
     /**
      * basic validate Input function if the field is not enum
-     * @param name name of the field
+     *
+     * @param name      name of the field
      * @param validator function to validate String
      * @return field converted to String
      */
-    private String validateInput(String name, Validatable validator){
+    private String validateInput(String name, Validatable validator) {
         return validateInput(name, validator, false, null);
     }
 
     /**
      * method that executes given command
+     *
      * @param cur_str string that contains command name and its arguments separated with the space character
      */
-    private void executeCmd(String cur_str){
+    private void executeCmd(String cur_str) {
         try {
             String[] curLine = cur_str.split(" ");
             String curCmd = curLine[0];
             Executable<T> curConsoleExecutable = myCommands.getCommandByName(curCmd);
             String[] args = new String[curLine.length - 1];
-            for (int i = 0; i < curLine.length - 1;i++){
-                args[i] = curLine[i+1];
+            for (int i = 0; i < curLine.length - 1; i++) {
+                args[i] = curLine[i + 1];
             }
             curConsoleExecutable.execute(this, myCollection, args);
         } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
             System.out.println("Command not found.");
-        } catch (RecursionInFileException e){
+        } catch (RecursionInFileException e) {
             System.out.println("Recursion in file spotted.");
         }
     }
 
     /**
      * method that returns the current stack of files, program is executing
+     *
      * @return ArrayList of files names
      */
-    public ArrayList<String> getFilesStack(){
+    public ArrayList<String> getFilesStack() {
         return filesStack;
     }
 
     /**
      * method that stops the main loop in run method
      */
-    public void exit(){
+    public void exit() {
         this.isRunning = false;
     }
 }

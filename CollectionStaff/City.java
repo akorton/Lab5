@@ -1,6 +1,8 @@
 package Lab5.CollectionStaff;
 
 
+import Lab5.InputStaff.Validator;
+
 import java.time.ZonedDateTime;
 
 public class City implements Comparable<City> {
@@ -138,5 +140,19 @@ public class City implements Comparable<City> {
         s += "  governor: [age: " + governor.getAge() + ", birthday: " + governor.getBirthday().toString().split("T")[0] + "]\n";
         s += "}";
         return s;
+    }
+
+    /**
+     * Validates all the fields of the city at once
+     * @param city city which fields to validate
+     * @return true if all the fields are correct false otherwise
+     */
+    public static boolean validateCity(City city){
+        return Validator.validateName(city.getName()) && Validator.validateX(String.valueOf(city.getCoordinates().getX())) &&
+                Validator.validateY(String.valueOf(city.getCoordinates().getY())) && Validator.validateAge(String.valueOf(city.getGovernor().getAge())) &&
+                Validator.validateArea(String.valueOf(city.getArea())) && Validator.validateClimate(city.getClimate().toString()) &&
+                Validator.validatePopulation(city.getPopulation().toString()) &&
+                Validator.validateStandartOfLining(city.getStandartOfLiving().toString()) && Validator.validateFloatValue(String.valueOf(city.getMetersAboveSeaLevel())) &&
+                Validator.validateFloatValue(String.valueOf(city.getAgglomeration())) && Validator.validateZonedDateTime(city.getCreationDate().toString());
     }
 }

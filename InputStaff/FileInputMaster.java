@@ -127,6 +127,9 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
         } catch (IOException e){
             System.out.println("Exception while reading the file.");
             return null;
+        } catch (NullPointerException e){
+            System.out.println("No path given.");
+            return null;
         }
     }
 

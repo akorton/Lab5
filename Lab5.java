@@ -6,11 +6,13 @@ import Lab5.InputStaff.ConsoleInputMaster;
 import Lab5.jsonStaff.GsonMaster;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
- * main class of the project
+ * main class of the project <br>
  * just start it..
  */
 public class Lab5 {
@@ -28,6 +30,21 @@ public class Lab5 {
      */
     private static LinkedList<City> setUp(){
         LinkedList<City> cities = new GsonMaster().deserialize(variableName);
-        return cities != null ? cities : new LinkedList<>();
+        if (cities == null) return new LinkedList<>();
+        LinkedList<City> citiesToRemove = new LinkedList<>();
+        Map<Long, Integer> idToNumberMap = new HashMap<>();
+        for (City city: cities){
+            if (idToNumberMap.containsKey(city.getId())) idToNumberMap.put(city.getId(), idToNumberMap.get(city.getId()) + 1);
+            else idToNumberMap.put(city.getId(), 1);
+        }
+        for (City city: cities){
+            System.out.println(city);
+            System.out.println(City.validateCity(city));
+            if (!City.validateCity(city) || idToNumberMap.get(city.getId()) > 1){
+                citiesToRemove.add(city);
+            }
+        }
+        cities.removeAll(citiesToRemove);
+        return cities;
     }
 }

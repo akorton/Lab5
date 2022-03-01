@@ -7,6 +7,7 @@ import Lab5.InputStaff.FileInputMaster;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
 
@@ -36,6 +37,10 @@ public class GsonMaster {
             FileInputMaster<City> fileInputMaster = new FileInputMaster<City>(System.getenv(sysVariableName));
             String serializedData = fileInputMaster.inputFile();
             if (serializedData == null) return null;
+            File file = new File(System.getenv(sysVariableName));
+            if (!file.canWrite()){
+                System.out.println("WARNING!!!\nFile is not writeable.");
+            }
             Gson gson = gsonBuilder.create();
             return gson.fromJson(serializedData, new TypeToken<LinkedList<City>>() {
             }.getType());

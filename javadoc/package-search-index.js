@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"Lab5"},{"l":"Lab5.CollectionStaff"},{"l":"Lab5.InputStaff"},{"l":"Lab5.jsonStaff"}];updateSearchResults();
