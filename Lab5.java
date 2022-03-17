@@ -38,8 +38,6 @@ public class Lab5 {
             else idToNumberMap.put(city.getId(), 1);
         }
         for (City city: cities){
-            System.out.println(city);
-            System.out.println(City.validateCity(city));
             if (!City.validateCity(city) || idToNumberMap.get(city.getId()) > 1){
                 citiesToRemove.add(city);
             }
