@@ -1,7 +1,7 @@
-package Lab5.InputStaff;
+package Lab5.Client;
 
-import Lab5.CollectionStaff.Climate;
-import Lab5.CollectionStaff.StandartOfLiving;
+import Lab5.Server.Climate;
+import Lab5.Server.StandartOfLiving;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;

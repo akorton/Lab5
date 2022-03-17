@@ -1,8 +1,11 @@
-package Lab5.InputStaff;
+package Lab5.Server.Commands;
 
-import Lab5.CollectionStaff.City;
-import Lab5.CollectionStaff.MyCollection;
-import Lab5.jsonStaff.GsonMaster;
+import Lab5.Client.Executable;
+import Lab5.Client.FileInputMaster;
+import Lab5.Client.Validator;
+import Lab5.Server.City;
+import Lab5.Server.MyCollection;
+import Lab5.CommonStaff.JsonStaff.GsonMaster;
 
 import java.io.*;
 import java.util.*;
@@ -196,10 +199,7 @@ public class CommandsMaster<T extends City> {
         commands.put("print_descending", (consoleInputMaster, myCollection, args)->{
             LinkedList<T> cur = myCollection.getMyCollection();
             if (cur.size() == 0) System.out.println("No elements in collection.");
-            cur.sort(Comparator.reverseOrder());
-            for (City city: cur){
-                System.out.println(city);
-            }
+            cur.stream().sorted(Comparator.reverseOrder()).forEachOrdered(System.out::println);
         });
     }
 

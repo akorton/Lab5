@@ -1,7 +1,7 @@
-package Lab5.CollectionStaff;
+package Lab5.Server;
 
 
-import Lab5.InputStaff.Validator;
+import Lab5.Client.Validator;
 
 import java.time.ZonedDateTime;
 

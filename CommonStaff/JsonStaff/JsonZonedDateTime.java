@@ -1,4 +1,4 @@
-package Lab5.jsonStaff;
+package Lab5.CommonStaff.JsonStaff;
 
 import com.google.gson.*;
 

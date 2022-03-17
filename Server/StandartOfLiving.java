@@ -1,4 +1,4 @@
-package Lab5.CollectionStaff;
+package Lab5.Server;
 
 public enum StandartOfLiving {
     ULTRA_HIGH("ULTRA_HIGH"),

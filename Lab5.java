@@ -1,27 +1,26 @@
 package Lab5;
 
-import Lab5.CollectionStaff.City;
-import Lab5.CollectionStaff.MyCollection;
-import Lab5.InputStaff.ConsoleInputMaster;
-import Lab5.jsonStaff.GsonMaster;
+import Lab5.Client.ClientMaster;
+import Lab5.Server.City;
+import Lab5.Server.MyCollection;
+import Lab5.Client.ConsoleInputMaster;
+import Lab5.CommonStaff.JsonStaff.GsonMaster;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * main class of the project <br>
- * just start it..
+ * just start it...<br>
+ * brrrrr<br>
  */
 public class Lab5 {
     private static final String variableName = "JAVA_PROJECT";
 
     public static void main(String... args) throws IOException {
         MyCollection<City> myCollection = new MyCollection<>(setUp());
-        ConsoleInputMaster<City> consoleInputMaster = new ConsoleInputMaster<>(new Scanner(System.in), myCollection);
-        consoleInputMaster.run();
+        ClientMaster clientMaster = new ClientMaster(3451);
+        clientMaster.start();
     }
 
     /**
@@ -29,7 +28,7 @@ public class Lab5 {
      * @return the initial state of the collection
      */
     private static LinkedList<City> setUp(){
-        LinkedList<City> cities = new GsonMaster().deserialize(variableName);
+        LinkedList<City> cities = new GsonMaster<>().deserialize(variableName);
         if (cities == null) return new LinkedList<>();
         LinkedList<City> citiesToRemove = new LinkedList<>();
         Map<Long, Integer> idToNumberMap = new HashMap<>();

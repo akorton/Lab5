@@ -1,4 +1,4 @@
-package Lab5.CollectionStaff;
+package Lab5.Server;
 
 public class Coordinates {
     private Double x;

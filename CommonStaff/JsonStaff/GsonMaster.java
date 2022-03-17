@@ -1,9 +1,9 @@
-package Lab5.jsonStaff;
+package Lab5.CommonStaff.JsonStaff;
 
-import Lab5.CollectionStaff.City;
-import Lab5.CollectionStaff.Coordinates;
-import Lab5.CollectionStaff.Human;
-import Lab5.InputStaff.FileInputMaster;
+import Lab5.Server.City;
+import Lab5.Server.Coordinates;
+import Lab5.Server.Human;
+import Lab5.Client.FileInputMaster;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
@@ -14,7 +14,7 @@ import java.util.LinkedList;
 /**
  * class to serialize and deserialize data to and from json
  */
-public class GsonMaster {
+public class GsonMaster<T> {
 
     public GsonMaster(){
 
@@ -50,12 +50,24 @@ public class GsonMaster {
         }
     }
 
+    public T deserialize(String serializedObject, Class<T> type){
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder
+                .setPrettyPrinting()
+                .registerTypeAdapter(ZonedDateTime.class, new JsonZonedDateTime())
+                .registerTypeAdapter(Coordinates.class, new JsonCoordinates())
+                .registerTypeAdapter(Human.class, new JsonHuman())
+                .registerTypeAdapter(City.class, new JsonCity());
+        Gson gson = gsonBuilder.create();
+        return gson.fromJson(serializedObject, type);
+    }
+
     /**
-     * makes json from Object
+     * makes json from T
      * @param o object to convert to json
      * @return json text
      */
-    public String serialize(Object o){
+    public String serialize(T o){
         try {
             GsonBuilder gsonBuilder = new GsonBuilder()
                     .setPrettyPrinting()
@@ -64,7 +76,7 @@ public class GsonMaster {
                     .registerTypeAdapter(Human.class, new JsonHuman())
                     .registerTypeAdapter(City.class, new JsonCity());
             Gson gson = gsonBuilder.create();
-            return gson.toJson(o);
+            return gson.toJson(o, o.getClass());
         } catch (JsonIOException e){
             System.out.println("Unable to parse to json.");
             return null;

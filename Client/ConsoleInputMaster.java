@@ -1,7 +1,9 @@
-package Lab5.InputStaff;
+package Lab5.Client;
 
-import Lab5.CollectionStaff.*;
-import Lab5.CollectionStaff.MyCollection;
+import Lab5.CommonStaff.CommandTypes;
+import Lab5.CommonStaff.JsonStaff.GsonMaster;
+import Lab5.Server.*;
+import Lab5.Server.MyCollection;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -14,16 +16,14 @@ import java.util.Scanner;
  * @param <T>
  */
 public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
-    private Scanner scanner;
+    private final Scanner scanner;
+    private final ClientMaster clientMaster;
     private boolean isRunning = true;
-    private final CommandsMaster<T> myCommands;
-    private final MyCollection<T> myCollection;
     private final ArrayList<String> filesStack = new ArrayList<>();
 
-    public ConsoleInputMaster(Scanner scanner, MyCollection<T> myCollection) {
+    public ConsoleInputMaster(Scanner scanner, ClientMaster clientMaster) {
         this.scanner = scanner;
-        this.myCommands = new CommandsMaster<>();
-        this.myCollection = myCollection;
+        this.clientMaster = clientMaster;
     }
 
     /**
@@ -153,16 +153,21 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
         try {
             String[] curLine = cur_str.split(" ");
             String curCmd = curLine[0];
-            Executable<T> curConsoleExecutable = myCommands.getCommandByName(curCmd);
-            String[] args = new String[curLine.length - 1];
-            for (int i = 0; i < curLine.length - 1; i++) {
-                args[i] = curLine[i + 1];
+            switch (curCmd){
+                case "help":
+                    if (curLine.length != 1){
+                        System.out.println("Неверное число аргументов.");
+                    } else{
+                        GsonMaster<CommandTypes> gsonMaster = new GsonMaster<>();
+                        String type = gsonMaster.serialize(CommandTypes.HELP);
+                        clientMaster.sendInfo(type);
+                    }
+                    break;
+                default:
+                    System.out.println("Command not found.");
             }
-            curConsoleExecutable.execute(this, myCollection, args);
         } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
             System.out.println("Command not found.");
-        } catch (RecursionInFileException e) {
-            System.out.println("Recursion in file spotted.");
         }
     }
 

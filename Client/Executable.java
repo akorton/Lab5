@@ -1,7 +1,7 @@
-package Lab5.InputStaff;
+package Lab5.Client;
 
-import Lab5.CollectionStaff.City;
-import Lab5.CollectionStaff.MyCollection;
+import Lab5.Server.City;
+import Lab5.Server.MyCollection;
 
 /**
  * interface that is implemented by commands

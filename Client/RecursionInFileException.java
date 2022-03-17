@@ -1,4 +1,4 @@
-package Lab5.InputStaff;
+package Lab5.Client;
 
 /**
  * is thrown when script contains name of the script that has not been completely executed yet

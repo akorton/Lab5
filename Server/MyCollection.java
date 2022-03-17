@@ -1,6 +1,4 @@
-package Lab5.CollectionStaff;
-
-import Lab5.CollectionStaff.City;
+package Lab5.Server;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;

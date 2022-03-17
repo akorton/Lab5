@@ -1,7 +1,8 @@
-package Lab5.InputStaff;
+package Lab5.Client;
 
-import Lab5.CollectionStaff.*;
-import Lab5.CollectionStaff.MyCollection;
+import Lab5.Server.*;
+import Lab5.Server.Commands.CommandsMaster;
+import Lab5.Server.MyCollection;
 
 import java.io.*;
 import java.time.ZonedDateTime;
