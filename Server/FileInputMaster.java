@@ -1,10 +1,11 @@
 package Lab5.Server;
 
+import Lab5.Client.ClientMaster;
 import Lab5.CommonStaff.CommandTypes;
 import Lab5.CommonStaff.InputMaster;
 import Lab5.Client.Validator;
-import Lab5.CommonStaff.JsonStaff.GsonMaster;
 import Lab5.CommonStaff.Message;
+import Lab5.CommonStaff.WrongNumberOfArguments;
 import Lab5.Server.Commands.CommandsMaster;
 
 import java.io.*;
@@ -19,6 +20,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
     private static final LinkedList<String> filesStack = new LinkedList<>();
     private InputStreamReader inputStreamReader;
     private MyCollection<T> myCollection;
+    private CommandsMaster<T> commandsMaster;
     private boolean isRunning = true;
     private String path;
 
@@ -32,6 +34,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
 
     public FileInputMaster(MyCollection<T> myCollection, String path) {
         this.myCollection = myCollection;
+        this.commandsMaster = new CommandsMaster<>(myCollection);
         this.path = path;
     }
 
@@ -40,9 +43,10 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
      * @throws RecursionInFileException when recursion in file appears
      */
     public String run() throws RecursionInFileException {
+        String result = "";
         try {
             File file = new File(path);
-            System.out.println(file.getAbsolutePath());
+//            System.out.println(file.getAbsolutePath());
             InputStreamReader reader = new FileReader(path);
             inputStreamReader = reader;
             if (getFilesStack().contains(file.getAbsolutePath())){
@@ -52,12 +56,14 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
             getFilesStack().add(file.getAbsolutePath());
             String curCmd = inputLine();
             while (!curCmd.isEmpty() && isRunning){
-                executeCmd(curCmd);
+                result += executeCmd(curCmd);
+                result += "\n";
                 curCmd = inputLine();
             }
             reader.close();
             getFilesStack().remove(file.getAbsolutePath());
-            return "Script was executed.";
+            result += "Script was executed.";
+            return result;
         } catch (FileNotFoundException e){
             return "File not found.";
         } catch (IOException e){
@@ -66,7 +72,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
     }
 
     /**
-     * executes currect command with the arguments if possible
+     * executes current command with the arguments if possible
      * @param cur_str string of command name and arguments
      * @throws RecursionInFileException thrown if the recursion in file is spotted
      */
@@ -76,17 +82,111 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
             String curCmd = curLine[0];
             switch (curCmd){
                 case "help":
-                    if (curLine.length != 1){
-                        return "Wrong number of arguments.";
-                    } else{
-                        CommandsMaster<T> commandsMaster = new CommandsMaster<>(myCollection);
-//                        return commandsMaster.executeCommand();
+                    if (validateNumberOfArgs(0, curLine))
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.HELP));
+                    break;
+                case "show":
+                    if (validateNumberOfArgs(0, curLine))
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.SHOW));
+                    break;
+                case "info":
+                    if (validateNumberOfArgs(0, curLine))
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.INFO));
+                    break;
+                case "clear":
+                    if (validateNumberOfArgs(0, curLine))
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.CLEAR));
+                    break;
+                case "remove_last":
+                    if (validateNumberOfArgs(0, curLine))
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_LAST));
+                    break;
+                case "reorder":
+                    if (validateNumberOfArgs(0, curLine))
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REORDER));
+                    break;
+                case "group_counting_by_area":
+                    if (validateNumberOfArgs(0, curLine))
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.GROUP_COUNTING));
+                    break;
+                case "print_descending":
+                    if (validateNumberOfArgs(0, curLine))
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.PRINT_DESCENDING));
+                    break;
+                case "remove_by_id":
+                    if (validateNumberOfArgs(1, curLine)) {
+                        String id = curLine[1];
+                        long idLong;
+                        try{
+                            idLong = Long.parseLong(id);
+                        } catch (NumberFormatException e){
+                            return "Wrong argument.";
+                        }
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_BY_ID, idLong));
                     }
+                    break;
+                case "execute_script":
+                    if (validateNumberOfArgs(1, curLine))
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.EXECUTE_SCRIPT, curLine[1]));
+                    break;
+                case "filter_greater_than_meters_above_sea_level":
+                    if (validateNumberOfArgs(1, curLine)){
+                        String meters = curLine[1];
+                        float m;
+                        try {
+                            m = Float.parseFloat(meters);
+                        } catch (NumberFormatException e){
+                            return "Wrong argument.";
+                        }
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.FILTER_GREATER, m));
+                    }
+                    break;
+                case "add":
+                    if (validateNumberOfArgs(0, curLine)){
+                        City c = inputCity();
+                        if (c == null)
+                            return "Wrong argument.";
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.ADD, c));
+                    }
+                    break;
+                case "remove_greater":
+                    if (validateNumberOfArgs(0, curLine)){
+                        City c = inputCity();
+                        if (c == null)
+                            return "Wrong argument.";
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_GREATER, c));
+                    }
+                    break;
+                case "update_by_id":
+                    if (validateNumberOfArgs(1, curLine)){
+                        String id = curLine[1];
+                        long idLong;
+                        try{
+                            idLong = Long.parseLong(id);
+                        } catch (NumberFormatException e){
+                            return "Wrong argument.";
+                        }
+                        City c = inputCity();
+                        if (c == null)
+                            return "Wrong argument.";
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.UPDATE, idLong, c));
+                    }
+                    break;
+                case "exit":
+                    if (validateNumberOfArgs(0, curLine)){
+                        exit();
+                        return "Have a good day sir!";
+                    }
+                    break;
+                default:
+                    return "Command not found.";
             }
         } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
             return "Command not found.";
+        } catch (WrongNumberOfArguments e){
+            return "Wrong number of arguments.";
         }
-        return "";
+        return null;
     }
 
     /**

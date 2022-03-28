@@ -2,7 +2,9 @@ package Lab5.Server;
 
 import Lab5.CommonStaff.JsonStaff.GsonMaster;
 import Lab5.Server.Commands.CommandsMaster;
+import Lab5.Server.Commands.SaveCommand;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -16,9 +18,15 @@ public class ServerMaster {
     private static final String variableName = "JAVA_PROJECT";
     private static final MyCollection<City> myCollection = new MyCollection<>(setUp());
     private static final CommandsMaster<City> commandsMaster = new CommandsMaster<>(myCollection);
+    private static final String DefaultPathName = File.separator.equals("/") ? "Files/InputFile" : "src\\Lab5\\Server\\Files\\InputFile";
     private static final int buffSize = 30000;
 
     public static void main(String[] args){
+        Thread saveHook = new Thread(()->{
+            SaveCommand<City, String> save = new SaveCommand<>(myCollection, DefaultPathName);
+            System.out.println(save.execute());
+        });
+        Runtime.getRuntime().addShutdownHook(saveHook);
         start();
     }
 
@@ -55,7 +63,13 @@ public class ServerMaster {
                 ByteBuffer buffer = ByteBuffer.wrap(message);
                 buffer.clear();
                 address = channel.receive(buffer);
-                byte[] answer = commandsMaster.executeCommand(message).getBytes(StandardCharsets.UTF_8);
+                String stringAnswer;
+                try {
+                    stringAnswer = commandsMaster.executeCommand(message);
+                } catch (RecursionInFileException e){
+                    stringAnswer = "Recursion in file spotted.";
+                }
+                byte[] answer = stringAnswer.getBytes(StandardCharsets.UTF_8);
                 ByteBuffer bufferAnswer = ByteBuffer.wrap(answer);
                 bufferAnswer.clear();
                 channel.send(bufferAnswer, address);

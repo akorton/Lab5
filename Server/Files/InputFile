@@ -36,5 +36,24 @@
       "age": 50,
       "birthday": "1980-04-03T00:00+03:00[Europe/Moscow]"
     }
+  },
+  {
+    "id": 3,
+    "name": "Rome",
+    "coordinates": {
+      "X": 5832.0,
+      "Y": 8515.0
+    },
+    "creationDate": "2022-03-28T19:46:27.565373700+03:00[Europe/Moscow]",
+    "area": 8029300.0,
+    "population": 280303,
+    "metersAboveSeaLevel": 100.0,
+    "agglomeration": 80.0,
+    "climate": "HUMIDCONTINENTAL",
+    "standartOfLiving": "ULTRA_HIGH",
+    "governor": {
+      "age": 76,
+      "birthday": "1956-04-05T00:00+03:00[Europe/Moscow]"
+    }
   }
 ]

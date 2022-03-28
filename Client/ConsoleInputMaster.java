@@ -143,7 +143,7 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
         return validateInput(name, validator, false, null);
     }
 
-    private boolean validateNumberOfArgs(int number, String[] line){
+    protected boolean validateNumberOfArgs(int number, String[] line) {
         if (number != line.length - 1) {
             System.out.println("Wrong number of arguments.");
             return false;

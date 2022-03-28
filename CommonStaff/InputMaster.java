@@ -32,6 +32,13 @@ public abstract class InputMaster<T extends City> {
      */
     public abstract T inputCity(T city);
 
+    protected boolean validateNumberOfArgs(int number, String[] line) throws WrongNumberOfArguments {
+        if (number != line.length - 1) {
+            throw new WrongNumberOfArguments();
+        }
+        return true;
+    }
+
     /**
      * method that stops the run method
      */

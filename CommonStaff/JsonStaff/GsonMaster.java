@@ -69,6 +69,7 @@ public class GsonMaster<T> {
     public String serialize(T o){
         try {
             GsonBuilder gsonBuilder = new GsonBuilder()
+                    .setPrettyPrinting()
                     .registerTypeAdapter(Coordinates.class, new JsonCoordinates())
                     .registerTypeAdapter(ZonedDateTime.class, new JsonZonedDateTime())
                     .registerTypeAdapter(Human.class, new JsonHuman())
