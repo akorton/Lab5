@@ -6,6 +6,8 @@ import Lab5.Server.Commands.CommandsMaster;
 import Lab5.Server.Commands.SaveCommand;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -17,19 +19,32 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.logging.*;
 
 public class ServerMaster {
     private static final String variableName = "JAVA_PROJECT";
     private static final MyCollection<City> myCollection = new MyCollection<>(setUp());
     private static final CommandsMaster<City> commandsMaster = new CommandsMaster<>(myCollection);
     private static final String DefaultPathName = File.separator.equals("/") ? "Files/InputFile" : "src\\Lab5\\Server\\Files\\InputFile";
+    private static final String LoggerConfig = File.separator.equals("/") ? "Files/LoggerConfig" : "src\\Lab5\\Server\\Files\\LoggerConfig";
     private static final int buffSize = 30000;
+    private static Logger logger;
     private static int port;
     static {
         try {
             port = Integer.parseInt(System.getenv("JAVA_PORT"));
         } catch (NumberFormatException e){
             port = 3451;
+        }
+        try{
+            FileInputStream ins = new FileInputStream(LoggerConfig);
+            LogManager.getLogManager().readConfiguration(ins);
+            logger = Logger.getLogger("Server");
+            commandsMaster.setLogger(logger);
+        } catch (FileNotFoundException e){
+            System.out.println("No logger config file.");
+        } catch (IOException e){
+            System.out.println("Probably wrong config for logger.");
         }
     }
 
@@ -65,6 +80,7 @@ public class ServerMaster {
     }
 
     private static void start(){
+        logger.info("Server is up.");
         try {
             SocketAddress address = new InetSocketAddress(port);
             DatagramChannel channel = DatagramChannel.open();
@@ -77,6 +93,7 @@ public class ServerMaster {
                 while (it.hasNext()){
                     SelectionKey sk = it.next();
                     if (sk.isReadable()){
+                        logger.info("New message on server.");
                         byte[] message = new byte[buffSize];
                         ByteBuffer buffer = ByteBuffer.wrap(message);
                         buffer.clear();
@@ -91,6 +108,7 @@ public class ServerMaster {
                         ByteBuffer bufferAnswer = ByteBuffer.wrap(answer);
                         bufferAnswer.clear();
                         channel.send(bufferAnswer, address);
+                        logger.info("Answer send back.");
                     }
                 }
                 it.remove();

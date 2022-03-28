@@ -8,12 +8,14 @@ import Lab5.Server.MyCollection;
 import Lab5.Server.RecursionInFileException;
 
 import java.io.*;
+import java.util.logging.Logger;
 
 /**
  * class that contains all commands
  */
 public class CommandsMaster<T extends City> {
     private final MyCollection<T> collection;
+    private Logger logger;
 
     public CommandsMaster(MyCollection<T> collection){
         this.collection = collection;
@@ -34,6 +36,7 @@ public class CommandsMaster<T extends City> {
 
     public String executeCommand(Message message) throws RecursionInFileException {
         CommandTypes type = message.getType();
+        if (logger != null) logger.info("Command: " + type + " is being executed.");
         switch (type) {
             case HELP:
                 return new HelpCommand<>(collection).execute();
@@ -66,5 +69,9 @@ public class CommandsMaster<T extends City> {
             default:
                 return "Unknown command.";
         }
+    }
+
+    public void setLogger(Logger logger){
+        this.logger = logger;
     }
 }
