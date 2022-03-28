@@ -2,16 +2,15 @@ package Lab5.CommonStaff.CollectionStaff;
 
 
 import Lab5.CommonStaff.Others.Validator;
-import Lab5.Server.MyCollection;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
-public class City extends MyCollection<City> implements Comparable<City>, Serializable {
+public class City implements Comparable<City>, Serializable {
     private Long id;
     private String name;
     private Coordinates coordinates;
-    private final java.time.ZonedDateTime creationDate;
+    private java.time.ZonedDateTime creationDate = java.time.ZonedDateTime.now();
     private double area;
     private Long population;
     private float metersAboveSeaLevel;
@@ -21,12 +20,10 @@ public class City extends MyCollection<City> implements Comparable<City>, Serial
     private Human governor;
 
     public City(){
-        this(MyCollection.generateNextId());
     }
 
     public City(Long id){
         this.id = id;
-        this.creationDate = java.time.ZonedDateTime.now();
     }
 
     public Long getId(){

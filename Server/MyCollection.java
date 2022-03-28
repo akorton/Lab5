@@ -77,6 +77,7 @@ public class MyCollection<T extends City> {
      * @param city element to add
      */
     public void addLast(T city){
+        if (containsId(city.getId()) || city.getId() == null) city.setId(generateNextId());
         myCollection.addLast(city);
     }
 
