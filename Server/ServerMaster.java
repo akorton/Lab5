@@ -94,6 +94,7 @@ public class ServerMaster {
                         channel.send(bufferAnswer, address);
                     }
                 }
+                it.remove();
             }
         } catch (SocketException e){
             System.out.println("Socket exception.");
