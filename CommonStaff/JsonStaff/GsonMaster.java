@@ -3,10 +3,9 @@ package Lab5.CommonStaff.JsonStaff;
 import Lab5.Server.City;
 import Lab5.Server.Coordinates;
 import Lab5.Server.Human;
-import Lab5.Client.FileInputMaster;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-
+import Lab5.Server.FileInputMaster;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
@@ -35,6 +34,7 @@ public class GsonMaster<T> {
                     .registerTypeAdapter(Human.class, new JsonHuman())
                     .registerTypeAdapter(City.class, new JsonCity());
             FileInputMaster<City> fileInputMaster = new FileInputMaster<City>(System.getenv(sysVariableName));
+            System.out.println(System.getenv(sysVariableName));
             String serializedData = fileInputMaster.inputFile();
             if (serializedData == null) return null;
             File file = new File(System.getenv(sysVariableName));
@@ -53,7 +53,6 @@ public class GsonMaster<T> {
     public T deserialize(String serializedObject, Class<T> type){
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder
-                .setPrettyPrinting()
                 .registerTypeAdapter(ZonedDateTime.class, new JsonZonedDateTime())
                 .registerTypeAdapter(Coordinates.class, new JsonCoordinates())
                 .registerTypeAdapter(Human.class, new JsonHuman())
@@ -70,7 +69,6 @@ public class GsonMaster<T> {
     public String serialize(T o){
         try {
             GsonBuilder gsonBuilder = new GsonBuilder()
-                    .setPrettyPrinting()
                     .registerTypeAdapter(Coordinates.class, new JsonCoordinates())
                     .registerTypeAdapter(ZonedDateTime.class, new JsonZonedDateTime())
                     .registerTypeAdapter(Human.class, new JsonHuman())

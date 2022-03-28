@@ -1,20 +1,22 @@
-package Lab5.Client;
+package Lab5.Server;
 
-import Lab5.Server.*;
+import Lab5.CommonStaff.CommandTypes;
+import Lab5.CommonStaff.InputMaster;
+import Lab5.Client.Validator;
+import Lab5.CommonStaff.JsonStaff.GsonMaster;
+import Lab5.CommonStaff.Message;
 import Lab5.Server.Commands.CommandsMaster;
-import Lab5.Server.MyCollection;
 
 import java.io.*;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * class that operates all the File input processes
  * @param <T>
  */
-public class FileInputMaster<T extends City> extends InputMaster<T>{
-    private InputMaster<T> inputMaster;
-    private CommandsMaster<T> myCommands;
+public class FileInputMaster<T extends City> extends InputMaster<T> {
+    private static final LinkedList<String> filesStack = new LinkedList<>();
     private InputStreamReader inputStreamReader;
     private MyCollection<T> myCollection;
     private boolean isRunning = true;
@@ -28,9 +30,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
         this.inputStreamReader = inputStreamReader;
     }
 
-    public FileInputMaster(InputMaster<T> inputMaster, MyCollection<T> myCollection, String path) {
-        this.inputMaster = inputMaster;
-        myCommands = new CommandsMaster<T>();
+    public FileInputMaster(MyCollection<T> myCollection, String path) {
         this.myCollection = myCollection;
         this.path = path;
     }
@@ -39,28 +39,28 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
      * reads the file and executes all the commands
      * @throws RecursionInFileException when recursion in file appears
      */
-    public void run() throws RecursionInFileException {
+    public String run() throws RecursionInFileException {
         try {
             File file = new File(path);
             InputStreamReader reader = new FileReader(path);
             inputStreamReader = reader;
-            if (inputMaster.getFilesStack().contains(file.getAbsolutePath())){
-                inputMaster.getFilesStack().clear();
+            if (getFilesStack().contains(file.getAbsolutePath())){
+                getFilesStack().clear();
                 throw new RecursionInFileException();
             }
-            inputMaster.getFilesStack().add(file.getAbsolutePath());
+            getFilesStack().add(file.getAbsolutePath());
             String curCmd = inputLine();
             while (!curCmd.isEmpty() && isRunning){
                 executeCmd(curCmd);
                 curCmd = inputLine();
             }
             reader.close();
-            inputMaster.getFilesStack().remove(file.getAbsolutePath());
-            System.out.println("Script was executed.");
+            getFilesStack().remove(file.getAbsolutePath());
+            return "Script was executed.";
         } catch (FileNotFoundException e){
-            System.out.println("File not found.");
+            return "File not found.";
         } catch (IOException e){
-            System.out.println("File can not be read from or smth else.");
+            return "File can not be read from or smth else.";
         }
     }
 
@@ -69,19 +69,23 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
      * @param cur_str string of command name and arguments
      * @throws RecursionInFileException thrown if the recursion in file is spotted
      */
-    private void executeCmd(String cur_str) throws RecursionInFileException {
+    private String executeCmd(String cur_str) throws RecursionInFileException {
         try {
             String[] curLine = cur_str.split(" ");
             String curCmd = curLine[0];
-            Executable<T> curExecutable = myCommands.getCommandByName(curCmd);
-            String[] args = new String[curLine.length - 1];
-            for (int i = 0; i < curLine.length - 1; i++) {
-                args[i] = curLine[i + 1];
+            switch (curCmd){
+                case "help":
+                    if (curLine.length != 1){
+                        return "Wrong number of arguments.";
+                    } else{
+                        CommandsMaster<T> commandsMaster = new CommandsMaster<>(myCollection);
+                        return commandsMaster.executeCommand(new GsonMaster<>().serialize(new Message<>(CommandTypes.HELP)));
+                    }
             }
-            curExecutable.execute(this, myCollection, args);
         } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
-            System.out.println("Command not found.");
+            return "Command not found.";
         }
+        return "";
     }
 
     /**
@@ -112,7 +116,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
     public String inputFile(){
         try{
             File file = new File(path);
-            if (file.createNewFile()){
+            if (!file.exists()){
                 System.out.println("The file does not exist.");
                 return null;
             }
@@ -214,26 +218,14 @@ public class FileInputMaster<T extends City> extends InputMaster<T>{
     }
 
     /**
-     * method that returns the current stack of files, program is executing
-     * @return ArrayList of files names
-     */
-    public ArrayList<String> getFilesStack(){
-        return inputMaster.getFilesStack();
-    }
-
-    /**
      * stops the loop in run
-     * @param exitInputMasterAlso if true invokes exit method in the inputMaster also
-     */
-    public void exit(boolean exitInputMasterAlso){
-        isRunning = false;
-        if (inputMaster != null && exitInputMasterAlso) inputMaster.exit();
-    }
-
-    /**
-     * default representation of exit with exitInputMasterAlso = true
      */
     public void exit(){
-        exit(true);
+        isRunning = false;
+        filesStack.pop();
+    }
+
+    private static LinkedList<String> getFilesStack(){
+        return filesStack;
     }
 }

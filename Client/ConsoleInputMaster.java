@@ -1,9 +1,9 @@
 package Lab5.Client;
 
 import Lab5.CommonStaff.CommandTypes;
-import Lab5.CommonStaff.JsonStaff.GsonMaster;
+import Lab5.CommonStaff.InputMaster;
+import Lab5.CommonStaff.Message;
 import Lab5.Server.*;
-import Lab5.Server.MyCollection;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -17,20 +17,17 @@ import java.util.Scanner;
  */
 public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
     private final Scanner scanner;
-    private final ClientMaster clientMaster;
     private boolean isRunning = true;
-    private final ArrayList<String> filesStack = new ArrayList<>();
 
-    public ConsoleInputMaster(Scanner scanner, ClientMaster clientMaster) {
+    public ConsoleInputMaster(Scanner scanner) {
         this.scanner = scanner;
-        this.clientMaster = clientMaster;
     }
 
     /**
      * overrides the method from InputMaster class
      * the main method that runs the input
      */
-    public void run() {
+    public String run() {
         System.out.println("help : вывести справку по доступным командам");
         while (isRunning) {
             System.out.print("Enter command: ");
@@ -40,6 +37,7 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
                 System.out.println("Not this time.");
             }
         }
+        return null;
     }
 
     /**
@@ -144,6 +142,14 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
         return validateInput(name, validator, false, null);
     }
 
+    private boolean validateNumberOfArgs(int number, String[] line){
+        if (number != line.length - 1) {
+            System.out.println("Wrong number of arguments.");
+            return false;
+        }
+        return true;
+    }
+
     /**
      * method that executes given command
      *
@@ -155,12 +161,17 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
             String curCmd = curLine[0];
             switch (curCmd){
                 case "help":
-                    if (curLine.length != 1){
-                        System.out.println("Неверное число аргументов.");
-                    } else{
-                        GsonMaster<CommandTypes> gsonMaster = new GsonMaster<>();
-                        String type = gsonMaster.serialize(CommandTypes.HELP);
-                        clientMaster.sendInfo(type);
+                    if (validateNumberOfArgs(0, curLine))
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.HELP)));
+                    break;
+                case "show":
+                    if (validateNumberOfArgs(0, curLine))
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.SHOW)));
+                    break;
+                case "exit":
+                    if (validateNumberOfArgs(0, curLine)){
+                        exit();
+                        System.out.println("Have a good day sir!");
                     }
                     break;
                 default:
@@ -169,15 +180,6 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
         } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
             System.out.println("Command not found.");
         }
-    }
-
-    /**
-     * method that returns the current stack of files, program is executing
-     *
-     * @return ArrayList of files names
-     */
-    public ArrayList<String> getFilesStack() {
-        return filesStack;
     }
 
     /**

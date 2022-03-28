@@ -81,23 +81,48 @@ public class MyCollection<T extends City> {
     /**
      * check if the element with id is in collection
      * @param id id to check
-     * @return element ef it is in collection else null
+     * @return true if it is in collection else false
      */
-    public T containsId(Long id){
+    private boolean containsId(Long id){
+        for (T city: myCollection){
+            if (city.getId().equals(id)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean updateById(Long id, T arg){
+        if (!containsId(id)) return false;
+        LinkedList<T> newCollection = new LinkedList<>();
+        for (T city: myCollection){
+            if (city.getId().equals(id)){
+                newCollection.add(arg);
+            } else{
+                newCollection.add(city);
+            }
+        }
+        myCollection = newCollection;
+        return true;
+    }
+
+    /**
+     * removes element with the given id from collection
+     * @param id id of element to remove
+     */
+    public boolean removeCityById(Long id){
+        if (!containsId(id)) return false;
+        myCollection.remove(getCityById(id));
+        return true;
+    }
+
+    private T getCityById(Long id){
         for (T city: myCollection){
             if (city.getId().equals(id)){
                 return city;
             }
         }
         return null;
-    }
-
-    /**
-     * removes the given element from collection
-     * @param city element to remove
-     */
-    public void removeCity(T city){
-        myCollection.remove(city);
     }
 
     /**

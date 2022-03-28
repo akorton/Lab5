@@ -1,6 +1,7 @@
-package Lab5.Client;
+package Lab5.CommonStaff;
 
 import Lab5.Server.City;
+import Lab5.Server.RecursionInFileException;
 
 import java.util.ArrayList;
 
@@ -14,7 +15,7 @@ public abstract class InputMaster<T extends City> {
      * main method of the InputMaster
      * @throws RecursionInFileException the recursion may be found in script
      */
-    public abstract void run() throws RecursionInFileException;
+    public abstract String run() throws RecursionInFileException;
 
     /**
      * method that returns Object that was inputted
@@ -36,8 +37,4 @@ public abstract class InputMaster<T extends City> {
      */
     public abstract void exit();
 
-    /**
-     * @return arraylist of scripts that are in the process of executing now
-     */
-    public abstract ArrayList<String> getFilesStack();
 }
