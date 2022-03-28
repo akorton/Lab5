@@ -1,6 +1,6 @@
 package Lab5.CommonStaff.JsonStaff;
 
-import Lab5.Server.Coordinates;
+import Lab5.CommonStaff.CollectionStaff.Coordinates;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;

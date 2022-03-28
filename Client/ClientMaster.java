@@ -1,18 +1,23 @@
 package Lab5.Client;
 
 
-import Lab5.CommonStaff.JsonStaff.GsonMaster;
-import Lab5.CommonStaff.Message;
-import Lab5.Server.City;
+import Lab5.CommonStaff.Others.Message;
+import Lab5.CommonStaff.CollectionStaff.City;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class ClientMaster {
     private static InetSocketAddress socketAddress;
-    private static final int port = 3451;
+    private static int port;
+    static {
+        try {
+            port = Integer.parseInt(System.getenv("JAVA_PORT"));
+        } catch (NumberFormatException e){
+            port = 3451;
+        }
+    }
     private static final int buffSize = 32000;
 
     public static void main(String[] args){

@@ -1,6 +1,6 @@
 package Lab5.CommonStaff.JsonStaff;
 
-import Lab5.Server.*;
+import Lab5.CommonStaff.CollectionStaff.*;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;

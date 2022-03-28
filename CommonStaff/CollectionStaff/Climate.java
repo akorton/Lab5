@@ -1,4 +1,4 @@
-package Lab5.Server;
+package Lab5.CommonStaff.CollectionStaff;
 
 import java.io.Serializable;
 

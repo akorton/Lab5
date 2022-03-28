@@ -1,9 +1,7 @@
-package Lab5.CommonStaff;
+package Lab5.CommonStaff.Others;
 
-import Lab5.Server.City;
+import Lab5.CommonStaff.CollectionStaff.City;
 import Lab5.Server.RecursionInFileException;
-
-import java.util.ArrayList;
 
 /**
  * class contains all needed methods for all InputMaster classes

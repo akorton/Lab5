@@ -1,7 +1,8 @@
-package Lab5.Server;
+package Lab5.CommonStaff.CollectionStaff;
 
 
-import Lab5.Client.Validator;
+import Lab5.CommonStaff.Others.Validator;
+import Lab5.Server.MyCollection;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;

@@ -1,11 +1,9 @@
 package Lab5.Server.Commands;
 
-import Lab5.Server.City;
+import Lab5.CommonStaff.CollectionStaff.City;
 import Lab5.Server.MyCollection;
 
 import java.util.NoSuchElementException;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
 
 public class ShowCommand<T extends City> extends CommandZero<T>{
 

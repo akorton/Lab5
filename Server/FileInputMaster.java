@@ -1,11 +1,7 @@
 package Lab5.Server;
 
-import Lab5.Client.ClientMaster;
-import Lab5.CommonStaff.CommandTypes;
-import Lab5.CommonStaff.InputMaster;
-import Lab5.Client.Validator;
-import Lab5.CommonStaff.Message;
-import Lab5.CommonStaff.WrongNumberOfArguments;
+import Lab5.CommonStaff.CollectionStaff.*;
+import Lab5.CommonStaff.Others.*;
 import Lab5.Server.Commands.CommandsMaster;
 
 import java.io.*;

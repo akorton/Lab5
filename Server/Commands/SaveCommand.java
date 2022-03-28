@@ -1,7 +1,7 @@
 package Lab5.Server.Commands;
 
 import Lab5.CommonStaff.JsonStaff.GsonMaster;
-import Lab5.Server.City;
+import Lab5.CommonStaff.CollectionStaff.City;
 import Lab5.Server.MyCollection;
 
 import java.io.*;

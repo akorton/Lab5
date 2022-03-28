@@ -1,8 +1,8 @@
 package Lab5.CommonStaff.JsonStaff;
 
-import Lab5.Server.City;
-import Lab5.Server.Coordinates;
-import Lab5.Server.Human;
+import Lab5.CommonStaff.CollectionStaff.City;
+import Lab5.CommonStaff.CollectionStaff.Coordinates;
+import Lab5.CommonStaff.CollectionStaff.Human;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import Lab5.Server.FileInputMaster;

@@ -1,9 +1,9 @@
 package Lab5.Server.Commands;
 
 
-import Lab5.CommonStaff.CommandTypes;
-import Lab5.CommonStaff.Message;
-import Lab5.Server.City;
+import Lab5.CommonStaff.Others.CommandTypes;
+import Lab5.CommonStaff.Others.Message;
+import Lab5.CommonStaff.CollectionStaff.City;
 import Lab5.Server.MyCollection;
 import Lab5.Server.RecursionInFileException;
 

@@ -1,13 +1,13 @@
 package Lab5.Client;
 
-import Lab5.CommonStaff.CommandTypes;
-import Lab5.CommonStaff.InputMaster;
-import Lab5.CommonStaff.Message;
-import Lab5.Server.*;
-import Lab5.Server.Commands.CommandsMaster;
+import Lab5.CommonStaff.Others.CommandTypes;
+import Lab5.CommonStaff.Others.InputMaster;
+import Lab5.CommonStaff.Others.Message;
+import Lab5.CommonStaff.CollectionStaff.*;
+import Lab5.CommonStaff.Others.Validatable;
+import Lab5.CommonStaff.Others.Validator;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -35,7 +35,8 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
             try {
                 executeCmd(scanner.nextLine());
             } catch (NoSuchElementException | IllegalStateException e){
-                System.out.println("Not this time.");
+                System.out.println("Have a good day sir!");
+                break;
             }
         }
         return null;

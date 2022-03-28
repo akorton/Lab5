@@ -1,4 +1,4 @@
-package Lab5.Client;
+package Lab5.CommonStaff.Others;
 
 /**
  * interface that is implemented by all validating functions
