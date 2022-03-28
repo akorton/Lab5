@@ -16,6 +16,7 @@ public class ServerMaster {
     private static final String variableName = "JAVA_PROJECT";
     private static final MyCollection<City> myCollection = new MyCollection<>(setUp());
     private static final CommandsMaster<City> commandsMaster = new CommandsMaster<>(myCollection);
+    private static final int buffSize = 30000;
 
     public static void main(String[] args){
         start();
@@ -50,13 +51,11 @@ public class ServerMaster {
 //            channel.configureBlocking(false);
             channel.bind(address);
             while (true) {
-                byte[] message = new byte[2048];
+                byte[] message = new byte[buffSize];
                 ByteBuffer buffer = ByteBuffer.wrap(message);
                 buffer.clear();
                 address = channel.receive(buffer);
-                String messageString = new String(message);
-                System.out.println(messageString);
-                byte[] answer = commandsMaster.executeCommand(messageString.substring(0, messageString.indexOf(0))).getBytes(StandardCharsets.UTF_8);
+                byte[] answer = commandsMaster.executeCommand(message).getBytes(StandardCharsets.UTF_8);
                 ByteBuffer bufferAnswer = ByteBuffer.wrap(answer);
                 bufferAnswer.clear();
                 channel.send(bufferAnswer, address);

@@ -3,9 +3,10 @@ package Lab5.Server;
 
 import Lab5.Client.Validator;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 
-public class City implements Comparable<City> {
+public class City extends MyCollection<City> implements Comparable<City>, Serializable {
     private Long id;
     private String name;
     private Coordinates coordinates;

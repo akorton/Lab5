@@ -4,6 +4,7 @@ import Lab5.CommonStaff.CommandTypes;
 import Lab5.CommonStaff.InputMaster;
 import Lab5.CommonStaff.Message;
 import Lab5.Server.*;
+import Lab5.Server.Commands.CommandsMaster;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -167,6 +168,83 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
                 case "show":
                     if (validateNumberOfArgs(0, curLine))
                         System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.SHOW)));
+                    break;
+                case "info":
+                    if (validateNumberOfArgs(0, curLine))
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.INFO)));
+                    break;
+                case "clear":
+                    if (validateNumberOfArgs(0, curLine))
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.CLEAR)));
+                    break;
+                case "remove_last":
+                    if (validateNumberOfArgs(0, curLine))
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REMOVE_LAST)));
+                    break;
+                case "reorder":
+                    if (validateNumberOfArgs(0, curLine))
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REORDER)));
+                    break;
+                case "group_counting_by_area":
+                    if (validateNumberOfArgs(0, curLine))
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.GROUP_COUNTING)));
+                    break;
+                case "print_descending":
+                    if (validateNumberOfArgs(0, curLine))
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.PRINT_DESCENDING)));
+                    break;
+                case "remove_by_id":
+                    if (validateNumberOfArgs(1, curLine)) {
+                        String id = curLine[1];
+                        long idLong;
+                        try{
+                            idLong = Long.parseLong(id);
+                        } catch (NumberFormatException e){
+                            idLong = Long.parseLong(validateInput("id", Validator::validateLong));
+                        }
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REMOVE_BY_ID, idLong)));
+                    }
+                    break;
+                case "execute_script":
+                    if (validateNumberOfArgs(1, curLine))
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.EXECUTE_SCRIPT, curLine[1])));
+                    break;
+                case "filter_greater_than_meters_above_sea_level":
+                    if (validateNumberOfArgs(1, curLine)){
+                        String meters = curLine[1];
+                        float m;
+                        try {
+                            m = Float.parseFloat(meters);
+                        } catch (NumberFormatException e){
+                            m = Float.parseFloat(validateInput("metersAboveSeaLevel", Validator::validateFloatValue));
+                        }
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.FILTER_GREATER, m)));
+                    }
+                    break;
+                case "add":
+                    if (validateNumberOfArgs(0, curLine)){
+                        City c = inputCity();
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.ADD, c)));
+                    }
+                    break;
+                case "remove_greater":
+                    if (validateNumberOfArgs(0, curLine)){
+                        City c = inputCity();
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REMOVE_GREATER, c)));
+                    }
+                    break;
+                case "update_by_id":
+                    if (validateNumberOfArgs(1, curLine)){
+                        String id = curLine[1];
+                        long idLong;
+                        try{
+                            idLong = Long.parseLong(id);
+                        } catch (NumberFormatException e){
+                            idLong = Long.parseLong(validateInput("id", Validator::validateLong));
+                        }
+                        City c = inputCity();
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.UPDATE, idLong, c)));
+                    }
                     break;
                 case "exit":
                     if (validateNumberOfArgs(0, curLine)){

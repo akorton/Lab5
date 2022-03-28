@@ -1,6 +1,8 @@
 package Lab5.Server;
 
-public enum StandartOfLiving {
+import java.io.Serializable;
+
+public enum StandartOfLiving implements Serializable {
     ULTRA_HIGH("ULTRA_HIGH"),
     HIGH("HIGH"),
     MEDIUM("MEDIUM"),

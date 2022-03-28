@@ -10,6 +10,7 @@ public class AddCommand<T extends City, U extends T> extends CommandOne<T, U>{
     }
 
     public String execute(){
+        arg.setId(MyCollection.generateNextId());
         collection.addLast(arg);
         return "Successfully added.";
     }

@@ -1,9 +1,12 @@
 package Lab5.CommonStaff;
 
-public class Message<T, U> {
+import java.io.Serializable;
+
+public class Message<T, U> implements Serializable {
     public CommandTypes type;
     public T arg = null;
     public U arg2 = null;
+
 
     public Message(CommandTypes type){
         this.type = type;
@@ -36,5 +39,14 @@ public class Message<T, U> {
     }
     public Class<?> getArg2Class(){
         return arg2.getClass();
+    }
+
+
+    public String toString() {
+        return "Message{" +
+                "type=" + type +
+                ", arg=" + arg +
+                ", arg2=" + arg2 +
+                '}';
     }
 }

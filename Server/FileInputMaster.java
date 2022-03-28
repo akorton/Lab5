@@ -42,6 +42,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
     public String run() throws RecursionInFileException {
         try {
             File file = new File(path);
+            System.out.println(file.getAbsolutePath());
             InputStreamReader reader = new FileReader(path);
             inputStreamReader = reader;
             if (getFilesStack().contains(file.getAbsolutePath())){
@@ -79,7 +80,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
                         return "Wrong number of arguments.";
                     } else{
                         CommandsMaster<T> commandsMaster = new CommandsMaster<>(myCollection);
-                        return commandsMaster.executeCommand(new GsonMaster<>().serialize(new Message<>(CommandTypes.HELP)));
+//                        return commandsMaster.executeCommand();
                     }
             }
         } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {

@@ -93,6 +93,7 @@ public class MyCollection<T extends City> {
     }
 
     public boolean updateById(Long id, T arg){
+        arg.setId(id);
         if (!containsId(id)) return false;
         LinkedList<T> newCollection = new LinkedList<>();
         for (T city: myCollection){

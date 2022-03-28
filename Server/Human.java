@@ -1,8 +1,9 @@
 package Lab5.Server;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 
-public class Human {
+public class Human implements Serializable {
     private int age;
     private java.time.ZonedDateTime birthday;
 

@@ -1,6 +1,8 @@
 package Lab5.Server;
 
-public class Coordinates {
+import java.io.Serializable;
+
+public class Coordinates implements Serializable {
     private Double x;
     private Float y;
 

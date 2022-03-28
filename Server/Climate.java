@@ -1,6 +1,8 @@
 package Lab5.Server;
 
-public enum Climate {
+import java.io.Serializable;
+
+public enum Climate implements Serializable {
     MONSOON("MONSOON"),
     HUMIDSUBTROPICAL("HUMIDSUBTROPICAL"),
     HUMIDCONTINENTAL("HUMIDCONTINENTAL"),

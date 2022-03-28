@@ -50,7 +50,7 @@ public class GsonMaster<T> {
         }
     }
 
-    public T deserialize(String serializedObject, Class<T> type){
+    public T deserialize(String serializedObject, T o){
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder
                 .registerTypeAdapter(ZonedDateTime.class, new JsonZonedDateTime())
@@ -58,7 +58,7 @@ public class GsonMaster<T> {
                 .registerTypeAdapter(Human.class, new JsonHuman())
                 .registerTypeAdapter(City.class, new JsonCity());
         Gson gson = gsonBuilder.create();
-        return gson.fromJson(serializedObject, type);
+        return (T) gson.fromJson(serializedObject, o.getClass());
     }
 
     /**

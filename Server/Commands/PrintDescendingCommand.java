@@ -14,7 +14,10 @@ public class PrintDescendingCommand<T extends City> extends CommandZero<T> {
 
     public String execute(){
         LinkedList<T> cur = collection.getMyCollection();
-        if (cur.size() == 0) System.out.println("No elements in collection.");
-        return cur.stream().sorted(Comparator.reverseOrder()).toString();
+        if (cur.size() == 0) return "No elements in collection.";
+        return cur.stream().sorted(Comparator.reverseOrder())
+                .map(City::toString)
+                .reduce((s1, s2)->s1+s2)
+                .get();
     }
 }
