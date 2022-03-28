@@ -29,7 +29,7 @@ public class GroupCommand<T extends City> extends CommandZero<T>{
         for (Map.Entry<Double, Integer> entry: groups.entrySet()){
             Double key = entry.getKey();
             Integer value = entry.getValue();
-            ans += "Elements with area %f: %d.\n".formatted(key, value);
+            ans += "Elements with area " + key + ": " + value + "\n";
         }
         return ans;
     }
