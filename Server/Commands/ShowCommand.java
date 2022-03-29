@@ -14,7 +14,6 @@ public class ShowCommand<T extends City> extends CommandZero<T>{
     public String execute() {
         try {
             return collection.getMyCollection().stream()
-                    .sorted((city1, city2) -> (int) (city1.getId() - city2.getId()))
                     .map(t -> t.toString())
                     .reduce((s, s2) -> s + s2).get();
         } catch (NoSuchElementException e){

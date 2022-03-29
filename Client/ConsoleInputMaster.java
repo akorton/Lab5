@@ -234,7 +234,7 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
                         System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REMOVE_GREATER, c)));
                     }
                     break;
-                case "update_by_id":
+                case "update":
                     if (validateNumberOfArgs(1, curLine)){
                         String id = curLine[1];
                         long idLong;

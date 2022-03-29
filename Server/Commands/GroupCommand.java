@@ -17,20 +17,14 @@ public class GroupCommand<T extends City> extends CommandZero<T>{
             return "No elements in collection.";
         }
         Map<Double, Integer> groups = new HashMap<>();
-        for (City city: collection.getMyCollection()){
-            double cur_area = city.getArea();
-            if (groups.containsKey(cur_area)){
-                groups.put(cur_area, groups.get(cur_area)+1);
-            } else{
-                groups.put(cur_area, 1);
-            }
-        }
-        String ans = "";
-        for (Map.Entry<Double, Integer> entry: groups.entrySet()){
-            Double key = entry.getKey();
-            Integer value = entry.getValue();
-            ans += "Elements with area " + key + ": " + value + "\n";
-        }
+        collection.getMyCollection().stream()
+                .forEach((c)->{
+                    if (groups.containsKey(c.getArea())) groups.put(c.getArea(), groups.get(c.getArea())+1);
+                    else groups.put(c.getArea(), 1);
+                });
+        String ans = groups.entrySet().stream()
+                .map((entry)-> "Elements with area " + entry.getKey() + ": " + entry.getValue())
+                .reduce((s1, s2)->s1+"\n"+s2).get();
         return ans;
     }
 }

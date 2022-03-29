@@ -55,5 +55,24 @@
       "age": 76,
       "birthday": "1956-04-05T00:00+03:00[Europe/Moscow]"
     }
+  },
+  {
+    "id": 4,
+    "name": "123",
+    "coordinates": {
+      "X": 123.0,
+      "Y": 123.0
+    },
+    "creationDate": "2022-03-29T03:32:10.715979500+03:00[Europe/Moscow]",
+    "area": 1001.0,
+    "population": 123,
+    "metersAboveSeaLevel": 13.0,
+    "agglomeration": 123.0,
+    "climate": "STEPPE",
+    "standartOfLiving": "HIGH",
+    "governor": {
+      "age": 123,
+      "birthday": "2003-05-05T01:00+04:00[Europe/Moscow]"
+    }
   }
 ]
