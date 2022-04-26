@@ -5,9 +5,9 @@ import Lab5.Server.MyCollection;
 
 import java.util.NoSuchElementException;
 
-public class FilterCommand<T extends City, U extends Float> extends CommandOne<T, U> {
+public class FilterCommand extends CommandOne<Float> {
 
-    public FilterCommand(MyCollection<T> collection, U arg){
+    public FilterCommand(MyCollection collection, Float arg){
         super(collection, arg);
     }
 
@@ -15,7 +15,7 @@ public class FilterCommand<T extends City, U extends Float> extends CommandOne<T
         try {
             return collection.getMyCollection()
                     .stream()
-                    .filter((city) -> city.getMetersAboveSeaLevel() > arg.floatValue())
+                    .filter((city) -> city.getMetersAboveSeaLevel() > arg)
                     .map(City::toString)
                     .reduce((c1, c2) -> c1 + c2)
                     .get();

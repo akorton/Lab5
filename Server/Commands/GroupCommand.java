@@ -1,14 +1,13 @@
 package Lab5.Server.Commands;
 
-import Lab5.CommonStaff.CollectionStaff.City;
 import Lab5.Server.MyCollection;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class GroupCommand<T extends City> extends CommandZero<T>{
+public class GroupCommand extends CommandZero{
 
-    public GroupCommand(MyCollection<T> collection){
+    public GroupCommand(MyCollection collection){
         super(collection);
     }
 
@@ -22,9 +21,8 @@ public class GroupCommand<T extends City> extends CommandZero<T>{
                     if (groups.containsKey(c.getArea())) groups.put(c.getArea(), groups.get(c.getArea())+1);
                     else groups.put(c.getArea(), 1);
                 });
-        String ans = groups.entrySet().stream()
+        return groups.entrySet().stream()
                 .map((entry)-> "Elements with area " + entry.getKey() + ": " + entry.getValue())
                 .reduce((s1, s2)->s1+"\n"+s2).get();
-        return ans;
     }
 }

@@ -33,7 +33,7 @@ public class GsonMaster<T> {
                     .registerTypeAdapter(Coordinates.class, new JsonCoordinates())
                     .registerTypeAdapter(Human.class, new JsonHuman())
                     .registerTypeAdapter(City.class, new JsonCity());
-            FileInputMaster<City> fileInputMaster = new FileInputMaster<City>(System.getenv(sysVariableName));
+            FileInputMaster fileInputMaster = new FileInputMaster(System.getenv(sysVariableName));
             System.out.println(System.getenv(sysVariableName));
             String serializedData = fileInputMaster.inputFile();
             if (serializedData == null) return null;
@@ -48,17 +48,6 @@ public class GsonMaster<T> {
             System.out.println("Unable to parse from json.");
             return null;
         }
-    }
-
-    public T deserialize(String serializedObject, T o){
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder
-                .registerTypeAdapter(ZonedDateTime.class, new JsonZonedDateTime())
-                .registerTypeAdapter(Coordinates.class, new JsonCoordinates())
-                .registerTypeAdapter(Human.class, new JsonHuman())
-                .registerTypeAdapter(City.class, new JsonCity());
-        Gson gson = gsonBuilder.create();
-        return (T) gson.fromJson(serializedObject, o.getClass());
     }
 
     /**

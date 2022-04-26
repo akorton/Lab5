@@ -1,11 +1,10 @@
 package Lab5.Server.Commands;
 
-import Lab5.CommonStaff.CollectionStaff.City;
 import Lab5.Server.MyCollection;
 
-public class RemoveLastCommand<T extends City> extends CommandZero<T>{
+public class RemoveLastCommand extends CommandZero{
 
-    public RemoveLastCommand(MyCollection<T> collection){
+    public RemoveLastCommand(MyCollection collection){
         super(collection);
     }
 

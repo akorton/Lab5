@@ -2,7 +2,6 @@ package Lab5.Client;
 
 
 import Lab5.CommonStaff.Others.Message;
-import Lab5.CommonStaff.CollectionStaff.City;
 
 import java.io.*;
 import java.net.*;
@@ -15,7 +14,7 @@ public class ClientMaster {
         try {
             port = Integer.parseInt(System.getenv("JAVA_PORT"));
         } catch (NumberFormatException e){
-            port = 3451;
+            port = 2222;
         }
     }
     private static final int buffSize = 32000;
@@ -23,10 +22,11 @@ public class ClientMaster {
     public static void main(String[] args){
         try {
             socketAddress = new InetSocketAddress(InetAddress.getLocalHost(), port);
+//            socketAddress = new InetSocketAddress(InetAddress.getByName("s336667@helios.se.ifmo.ru") , port);
         } catch (UnknownHostException e){
             System.out.println("Unknown host.");
         }
-        ConsoleInputMaster<City> consoleInputMaster = new ConsoleInputMaster<>(new Scanner(System.in));
+        ConsoleInputMaster consoleInputMaster = new ConsoleInputMaster(new Scanner(System.in));
         consoleInputMaster.run();
     }
 

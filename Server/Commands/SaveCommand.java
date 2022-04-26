@@ -7,9 +7,9 @@ import Lab5.Server.MyCollection;
 import java.io.*;
 import java.util.LinkedList;
 
-public class SaveCommand<T extends City, U extends String> extends CommandOne<T, String>{
+public class SaveCommand extends CommandOne<String>{
 
-    public SaveCommand(MyCollection<T> myCollection, String path){
+    public SaveCommand(MyCollection myCollection, String path){
         super(myCollection, path);
     }
 
@@ -17,7 +17,7 @@ public class SaveCommand<T extends City, U extends String> extends CommandOne<T,
         try{
             File file = new File(arg);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file));
-            String data = new GsonMaster<LinkedList<T>>().serialize(collection.getMyCollection());
+            String data = new GsonMaster<LinkedList<City>>().serialize(collection.getMyCollection());
             outputStreamWriter.write(data);
             outputStreamWriter.close();
             return "Successfully saved.";

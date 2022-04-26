@@ -3,9 +3,9 @@ package Lab5.Server.Commands;
 import Lab5.CommonStaff.CollectionStaff.City;
 import Lab5.Server.MyCollection;
 
-public class ReorderCommand<T extends City> extends CommandZero<T>{
+public class ReorderCommand extends CommandZero{
 
-    public ReorderCommand(MyCollection<T> collection){
+    public ReorderCommand(MyCollection collection){
         super(collection);
     }
 

@@ -3,9 +3,9 @@ package Lab5.Server.Commands;
 import Lab5.CommonStaff.CollectionStaff.City;
 import Lab5.Server.MyCollection;
 
-public class ClearCommand<T extends City> extends CommandZero<T>{
+public class ClearCommand extends CommandZero{
 
-    public ClearCommand(MyCollection<T> collection){
+    public ClearCommand(MyCollection collection){
         super(collection);
     }
 

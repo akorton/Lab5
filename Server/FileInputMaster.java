@@ -10,13 +10,11 @@ import java.util.LinkedList;
 
 /**
  * class that operates all the File input processes
- * @param <T>
  */
-public class FileInputMaster<T extends City> extends InputMaster<T> {
+public class FileInputMaster extends InputMaster {
     private static final LinkedList<String> filesStack = new LinkedList<>();
     private InputStreamReader inputStreamReader;
-    private MyCollection<T> myCollection;
-    private CommandsMaster<T> commandsMaster;
+    private final CommandsMaster commandsMaster = CommandsMaster.getCommandsMaster();
     private boolean isRunning = true;
     private String path;
 
@@ -28,18 +26,13 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
         this.inputStreamReader = inputStreamReader;
     }
 
-    public FileInputMaster(MyCollection<T> myCollection, String path) {
-        this.myCollection = myCollection;
-        this.commandsMaster = new CommandsMaster<>(myCollection);
-        this.path = path;
-    }
 
     /**
      * reads the file and executes all the commands
      * @throws RecursionInFileException when recursion in file appears
      */
     public String run() throws RecursionInFileException {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         try {
             File file = new File(path);
 //            System.out.println(file.getAbsolutePath());
@@ -52,14 +45,14 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
             getFilesStack().add(file.getAbsolutePath());
             String curCmd = inputLine();
             while (!curCmd.isEmpty() && isRunning){
-                result += executeCmd(curCmd);
-                result += "\n";
+                result.append(executeCmd(curCmd));
+                result.append("\n");
                 curCmd = inputLine();
             }
             reader.close();
             getFilesStack().remove(file.getAbsolutePath());
-            result += "Script was executed.";
-            return result;
+            result.append("Script was executed.");
+            return result.toString();
         } catch (FileNotFoundException e){
             return "File not found.";
         } catch (IOException e){
@@ -191,7 +184,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
      * @throws IOException thrown if it is not possible to read from the file
      */
     private String inputLine() throws IOException{
-        String curStr = "";
+        StringBuilder curStr = new StringBuilder();
         int cur = inputStreamReader.read();
         while (cur != -1) {
             char cur_char = (char) cur;
@@ -199,11 +192,11 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
                 inputStreamReader.read();
                 break;
             } else {
-                curStr += cur_char;
+                curStr.append(cur_char);
             }
             cur = inputStreamReader.read();
         }
-        return curStr;
+        return curStr.toString();
     }
 
     /**
@@ -218,7 +211,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
                 return null;
             }
             InputStreamReader fileInputStream = new InputStreamReader(new FileInputStream(file));
-            FileInputMaster<T> fileInputMaster = new FileInputMaster<T>(fileInputStream);
+            FileInputMaster fileInputMaster = new FileInputMaster(fileInputStream);
             String result = "";
             String cur_string = fileInputMaster.inputLine();
             while (!cur_string.isEmpty()){
@@ -240,7 +233,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
      * @param city object fields of which would be modified
      * @return T object
      */
-    public T inputCity(T city){
+    public City inputCity(City city){
         try{
             String name = inputLine();
             if (!Validator.validateName(name)){
@@ -311,7 +304,7 @@ public class FileInputMaster<T extends City> extends InputMaster<T> {
             System.out.println("Wrong city input.");
             return null;
         }
-        return (T) city;
+        return city;
     }
 
     /**

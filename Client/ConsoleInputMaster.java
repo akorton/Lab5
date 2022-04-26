@@ -13,10 +13,8 @@ import java.util.Scanner;
 
 /**
  * class that operates all the input from console
- *
- * @param <T>
  */
-public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
+public class ConsoleInputMaster extends InputMaster {
     private final Scanner scanner;
     private boolean isRunning = true;
 
@@ -48,7 +46,7 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
      * @param curCity the City to set all the fields
      * @return T object with all inputted and validated fields
      */
-    public T inputCity(City curCity) {
+    public City inputCity(City curCity) {
         System.out.println("Entering City...");
 
         String name = validateInput("name", Validator::validateName);
@@ -91,7 +89,7 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
         governor.setBirthday(ZonedDateTime.parse(birthday));
 
         curCity.setGovernor(governor);
-        return (T) curCity;
+        return curCity;
     }
 
     /**
@@ -99,7 +97,7 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
      *
      * @return T object
      */
-    public T inputCity() {
+    public City inputCity() {
         return inputCity(new City());
     }
 
@@ -113,18 +111,18 @@ public class ConsoleInputMaster<T extends City> extends InputMaster<T> {
      * @return value of the field converted to String
      */
     private String validateInput(String name, Validatable validator, boolean isEnum, Enum[] enumValues) {
-        String standartOutput;
-        if (!isEnum) standartOutput = "Enter " + name + ": ";
+        StringBuilder standartOutput;
+        if (!isEnum) standartOutput = new StringBuilder("Enter " + name + ": ");
         else {
-            standartOutput = "Enter " + name + "(";
+            standartOutput = new StringBuilder("Enter " + name + "(");
             for (Enum en : enumValues) {
-                standartOutput += en.name() + ", ";
+                standartOutput.append(en.name()).append(", ");
             }
-            standartOutput = standartOutput.substring(0, standartOutput.length() - 2);
-            standartOutput += "): ";
+            standartOutput = new StringBuilder(standartOutput.substring(0, standartOutput.length() - 2));
+            standartOutput.append("): ");
         }
 
-        System.out.printf(standartOutput, name);
+        System.out.printf(standartOutput.toString(), name);
         String s = scanner.nextLine();
         while (!validator.validate(s)) {
             System.out.printf("Incorrect %s\n%s", name, standartOutput);

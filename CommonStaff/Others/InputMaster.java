@@ -5,9 +5,8 @@ import Lab5.Server.RecursionInFileException;
 
 /**
  * class contains all needed methods for all InputMaster classes
- * @param <T>
  */
-public abstract class InputMaster<T extends City> {
+public abstract class InputMaster {
 
     /**
      * main method of the InputMaster
@@ -19,8 +18,8 @@ public abstract class InputMaster<T extends City> {
      * method that returns Object that was inputted
      * @return Object that was inputted
      */
-    public T inputCity(){
-        return inputCity((T) new City());
+    public City inputCity(){
+        return inputCity(new City());
     }
 
     /**
@@ -28,7 +27,7 @@ public abstract class InputMaster<T extends City> {
      * @param city object fields of which would be modified
      * @return inputted object
      */
-    public abstract T inputCity(T city);
+    public abstract City inputCity(City city);
 
     protected boolean validateNumberOfArgs(int number, String[] line) throws WrongNumberOfArguments {
         if (number != line.length - 1) {

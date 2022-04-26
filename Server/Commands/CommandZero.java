@@ -1,11 +1,10 @@
 package Lab5.Server.Commands;
 
-import Lab5.CommonStaff.CollectionStaff.City;
 import Lab5.Server.MyCollection;
 
-public abstract class CommandZero<T extends City> extends Command<T>{
+public abstract class CommandZero extends Command{
 
-    public CommandZero(MyCollection<T> collection){
+    public CommandZero(MyCollection collection){
         super(collection);
     }
 

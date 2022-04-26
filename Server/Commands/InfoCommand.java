@@ -3,9 +3,9 @@ package Lab5.Server.Commands;
 import Lab5.CommonStaff.CollectionStaff.City;
 import Lab5.Server.MyCollection;
 
-public class InfoCommand<T extends City> extends CommandZero<T>{
+public class InfoCommand extends CommandZero{
 
-    public InfoCommand(MyCollection<T> collection){
+    public InfoCommand(MyCollection collection){
         super(collection);
     }
 

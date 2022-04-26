@@ -13,18 +13,22 @@ import java.util.logging.Logger;
 /**
  * class that contains all commands
  */
-public class CommandsMaster<T extends City> {
-    private final MyCollection<T> collection;
+public class CommandsMaster {
+    private static final MyCollection collection = MyCollection.getCollection();
     private Logger logger;
+    private static final CommandsMaster commandsMaster = new CommandsMaster();
 
-    public CommandsMaster(MyCollection<T> collection){
-        this.collection = collection;
+    private CommandsMaster(){
+    }
+
+    public static CommandsMaster getCommandsMaster(){
+        return commandsMaster;
     }
 
     public String executeCommand(byte[] bytes) throws RecursionInFileException {
         try {
             ObjectInputStream objectIn = new ObjectInputStream(new ByteArrayInputStream(bytes));
-            Message<?, ?> message = (Message) objectIn.readObject();
+            Message<?, ?> message = (Message<?, ?>) objectIn.readObject();
             return executeCommand(message);
         } catch (IOException e){
             return "Unable to parse from bytes.";
@@ -34,38 +38,38 @@ public class CommandsMaster<T extends City> {
     }
 
 
-    public String executeCommand(Message message) throws RecursionInFileException {
+    public String executeCommand(Message<?, ?> message) throws RecursionInFileException {
         CommandTypes type = message.getType();
         if (logger != null) logger.info("Command: " + type + " is being executed.");
         switch (type) {
             case HELP:
-                return new HelpCommand<>(collection).execute();
+                return new HelpCommand(collection).execute();
             case INFO:
-                return new InfoCommand<>(collection).execute();
+                return new InfoCommand(collection).execute();
             case SHOW:
-                return new ShowCommand<>(collection).execute();
+                return new ShowCommand(collection).execute();
             case CLEAR:
-                return new ClearCommand<>(collection).execute();
+                return new ClearCommand(collection).execute();
             case REORDER:
-                return new ReorderCommand<>(collection).execute();
+                return new ReorderCommand(collection).execute();
             case REMOVE_LAST:
-                return new RemoveLastCommand<>(collection).execute();
+                return new RemoveLastCommand(collection).execute();
             case PRINT_DESCENDING:
-                return new PrintDescendingCommand<>(collection).execute();
+                return new PrintDescendingCommand(collection).execute();
             case GROUP_COUNTING:
-                return new GroupCommand<>(collection).execute();
+                return new GroupCommand(collection).execute();
             case ADD:
-                return new AddCommand<>(collection, (T) message.getArg()).execute();
+                return new AddCommand(collection, (City) message.getArg()).execute();
             case UPDATE:
-                return new UpdateCommand<>(collection, (Long) message.getArg(), (T) message.getArg2()).execute();
+                return new UpdateCommand(collection, (Long) message.getArg(), (City) message.getArg2()).execute();
             case REMOVE_BY_ID:
-                return new RemoveByIdCommand<>(collection, (Long) message.getArg()).execute();
+                return new RemoveByIdCommand(collection, (Long) message.getArg()).execute();
             case FILTER_GREATER:
-                return new FilterCommand<>(collection, (Float) message.getArg()).execute();
+                return new FilterCommand(collection, (Float) message.getArg()).execute();
             case REMOVE_GREATER:
-                return new RemoveGreaterCommand<>(collection, (T) message.getArg()).execute();
+                return new RemoveGreaterCommand(collection, (City) message.getArg()).execute();
             case EXECUTE_SCRIPT:
-                return new ExecuteScriptCommand<>(collection, (String) message.getArg()).execute();
+                return new ExecuteScriptCommand(collection, (String) message.getArg()).execute();
             default:
                 return "Unknown command.";
         }

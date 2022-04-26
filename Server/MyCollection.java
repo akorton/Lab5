@@ -3,31 +3,25 @@ package Lab5.Server;
 import Lab5.CommonStaff.CollectionStaff.City;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
  * class that encapsulates all the operations upon the collection
- * @param <T>
  */
-public class MyCollection<T extends City> {
+public class MyCollection {
     private static Long cur_id = 1L;
-    private LinkedList<T> myCollection = new LinkedList<>();
-    private final String creationTime;
+    private LinkedList<City> myCollection = new LinkedList<>();
+    private final String creationTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis());
+    private static final MyCollection collection = new MyCollection();
 
-    public MyCollection(){
-        creationTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis());
+    private MyCollection(){
     }
 
-    public MyCollection(Collection<T> initialCollection){
-        this();
-        myCollection.addAll(initialCollection);
-        for (T city: myCollection){
-            if (city.getId().compareTo(cur_id) >= 0){
-                cur_id = city.getId() + 1;
-            }
-        }
+    public static MyCollection getCollection(){
+        return collection;
     }
 
     public String getCreationTime(){
@@ -68,17 +62,25 @@ public class MyCollection<T extends City> {
     /**
      * @return the copy of the collection
      */
-    public LinkedList<T> getMyCollection(){
-        return new LinkedList<T>(myCollection);
+    public LinkedList<City> getMyCollection(){
+        return new LinkedList<>(myCollection);
     }
 
     /**
      * adds element to the collection
      * @param city element to add
      */
-    public void addLast(T city){
-        if (containsId(city.getId()) || city.getId() == null) city.setId(generateNextId());
+    public void addLast(City city){
+        while (containsId(city.getId()) || city.getId() == null){
+            city.setId(generateNextId());
+        }
         myCollection.addLast(city);
+    }
+
+    public void addAll(Collection<? extends City> cities){
+        for (City city: cities){
+            addLast(city);
+        }
     }
 
     /**
@@ -87,7 +89,7 @@ public class MyCollection<T extends City> {
      * @return true if it is in collection else false
      */
     private boolean containsId(Long id){
-        for (T city: myCollection){
+        for (City city: myCollection){
             if (city.getId().equals(id)){
                 return true;
             }
@@ -95,11 +97,11 @@ public class MyCollection<T extends City> {
         return false;
     }
 
-    public boolean updateById(Long id, T arg){
+    public boolean updateById(Long id, City arg){
         arg.setId(id);
         if (!containsId(id)) return false;
-        LinkedList<T> newCollection = new LinkedList<>();
-        for (T city: myCollection){
+        LinkedList<City> newCollection = new LinkedList<>();
+        for (City city: myCollection){
             if (city.getId().equals(id)){
                 newCollection.add(arg);
             } else{
@@ -120,8 +122,8 @@ public class MyCollection<T extends City> {
         return true;
     }
 
-    private T getCityById(Long id){
-        for (T city: myCollection){
+    private City getCityById(Long id){
+        for (City city: myCollection){
             if (city.getId().equals(id)){
                 return city;
             }
@@ -133,8 +135,8 @@ public class MyCollection<T extends City> {
      * changes the order od the elements in collection
      */
     public void reorder(){
-        LinkedList<T> newCollection = new LinkedList<>();
-        for (Iterator<T> it = myCollection.descendingIterator();it.hasNext();){
+        LinkedList<City> newCollection = new LinkedList<>();
+        for (Iterator<City> it = myCollection.descendingIterator(); it.hasNext();){
             newCollection.add(it.next());
         }
         myCollection = newCollection;
@@ -144,7 +146,7 @@ public class MyCollection<T extends City> {
      * removes all given elements
      * @param cities elements hto remove
      */
-    public void removeAll(Collection<T> cities) {myCollection.removeAll(cities);}
+    public void removeAll(Collection<City> cities) {myCollection.removeAll(cities);}
 
     /**
      * generates id for the next element
@@ -155,10 +157,10 @@ public class MyCollection<T extends City> {
     }
 
     public String toString(){
-        String s = "";
-        for (T city: myCollection){
-            s += city.toString() + "\n";
+        StringBuilder s = new StringBuilder();
+        for (City city: myCollection){
+            s.append(city.toString()).append("\n");
         }
-        return s;
+        return s.toString();
     }
 }

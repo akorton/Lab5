@@ -23,18 +23,19 @@ import java.util.logging.*;
 
 public class ServerMaster {
     private static final String variableName = "JAVA_PROJECT";
-    private static final MyCollection<City> myCollection = new MyCollection<>(setUp());
-    private static final CommandsMaster<City> commandsMaster = new CommandsMaster<>(myCollection);
+    private static final MyCollection myCollection = MyCollection.getCollection();
+    private static final CommandsMaster commandsMaster = CommandsMaster.getCommandsMaster();
     private static final String DefaultPathName = File.separator.equals("/") ? "Files/InputFile" : "src\\Lab5\\Server\\Files\\InputFile";
     private static final String LoggerConfig = File.separator.equals("/") ? "Files/LoggerConfig" : "src\\Lab5\\Server\\Files\\LoggerConfig";
     private static final int buffSize = 30000;
     private static Logger logger;
     private static int port;
     static {
+        myCollection.addAll(setUp());
         try {
             port = Integer.parseInt(System.getenv("JAVA_PORT"));
         } catch (NumberFormatException e){
-            port = 3451;
+            port = 2222;
         }
         try{
             FileInputStream ins = new FileInputStream(LoggerConfig);
@@ -50,7 +51,7 @@ public class ServerMaster {
 
     public static void main(String[] args){
         Thread saveHook = new Thread(()->{
-            SaveCommand<City, String> save = new SaveCommand<>(myCollection, DefaultPathName);
+            SaveCommand save = new SaveCommand(myCollection, DefaultPathName);
             System.out.println(save.execute());
         });
         Runtime.getRuntime().addShutdownHook(saveHook);

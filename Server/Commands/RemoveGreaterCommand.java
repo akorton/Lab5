@@ -5,9 +5,9 @@ import Lab5.Server.MyCollection;
 
 import java.util.stream.Collectors;
 
-public class RemoveGreaterCommand<T extends City, U extends T>  extends CommandOne<T, U> {
+public class RemoveGreaterCommand  extends CommandOne<City> {
 
-    public RemoveGreaterCommand(MyCollection<T> collection, U arg){
+    public RemoveGreaterCommand(MyCollection collection, City arg){
         super(collection, arg);
     }
 
