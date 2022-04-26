@@ -52,7 +52,7 @@ public class ClientMaster {
 
                 String answerString = new String(ans);
                 if (answerString.indexOf(0) == -1) {
-                    return answerString + "\nWarning!\nThe answer is too large, so it may be incomplete!";
+                    return answerString + "\nWarning!\nThe answer is too large, so it is most likely incomplete!";
                 }
                 return answerString.substring(0, answerString.indexOf(0));
             } catch (SocketTimeoutException e){
