@@ -22,7 +22,6 @@ public class ClientMaster {
     public static void main(String[] args){
         try {
             socketAddress = new InetSocketAddress(InetAddress.getLocalHost(), port);
-//            socketAddress = new InetSocketAddress(InetAddress.getByName("s336667@helios.se.ifmo.ru") , port);
         } catch (UnknownHostException e){
             System.out.println("Unknown host.");
         }
@@ -32,7 +31,7 @@ public class ClientMaster {
 
     public static String sendInfo(Message<?, ?> message){
         byte[] mes;
-        try {
+        try{
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream(buffSize);
             ObjectOutputStream objectOut = new ObjectOutputStream(byteOut);
             objectOut.writeObject(message);
@@ -52,6 +51,9 @@ public class ClientMaster {
                 datagramSocket.receive(answer);
 
                 String answerString = new String(ans);
+                if (answerString.indexOf(0) == -1) {
+                    return answerString + "\nWarning!\nThe answer is too large, so it may be incomplete!";
+                }
                 return answerString.substring(0, answerString.indexOf(0));
             } catch (SocketTimeoutException e){
                 return "Server does not respond.";

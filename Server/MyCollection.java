@@ -3,7 +3,6 @@ package Lab5.Server;
 import Lab5.CommonStaff.CollectionStaff.City;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -17,8 +16,7 @@ public class MyCollection {
     private final String creationTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis());
     private static final MyCollection collection = new MyCollection();
 
-    private MyCollection(){
-    }
+    private MyCollection(){}
 
     public static MyCollection getCollection(){
         return collection;

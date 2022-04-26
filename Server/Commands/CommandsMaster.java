@@ -59,15 +59,21 @@ public class CommandsMaster {
             case GROUP_COUNTING:
                 return new GroupCommand(collection).execute();
             case ADD:
-                return new AddCommand(collection, (City) message.getArg()).execute();
+                if (City.validateCity((City) message.getArg())) {
+                    return new AddCommand(collection, (City) message.getArg()).execute();
+                } else return "Invalid City. Try again.";
             case UPDATE:
-                return new UpdateCommand(collection, (Long) message.getArg(), (City) message.getArg2()).execute();
+                if (City.validateCity((City) message.getArg2())){
+                    return new UpdateCommand(collection, (Long) message.getArg(), (City) message.getArg2()).execute();
+                } else return "Invalid City. Try again.";
             case REMOVE_BY_ID:
                 return new RemoveByIdCommand(collection, (Long) message.getArg()).execute();
             case FILTER_GREATER:
                 return new FilterCommand(collection, (Float) message.getArg()).execute();
             case REMOVE_GREATER:
-                return new RemoveGreaterCommand(collection, (City) message.getArg()).execute();
+                if (City.validateCity((City) message.getArg())){
+                    return new RemoveGreaterCommand(collection, (City) message.getArg()).execute();
+                } else return "Invalid City. Try again.";
             case EXECUTE_SCRIPT:
                 return new ExecuteScriptCommand(collection, (String) message.getArg()).execute();
             default:

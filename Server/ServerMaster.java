@@ -15,10 +15,7 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.*;
 
 public class ServerMaster {
@@ -27,7 +24,7 @@ public class ServerMaster {
     private static final CommandsMaster commandsMaster = CommandsMaster.getCommandsMaster();
     private static final String DefaultPathName = File.separator.equals("/") ? "Files/InputFile" : "src\\Lab5\\Server\\Files\\InputFile";
     private static final String LoggerConfig = File.separator.equals("/") ? "Files/LoggerConfig" : "src\\Lab5\\Server\\Files\\LoggerConfig";
-    private static final int buffSize = 30000;
+    private static final int buffSize = 32000;
     private static Logger logger;
     private static int port;
     static {
@@ -105,7 +102,7 @@ public class ServerMaster {
                         } catch (RecursionInFileException e){
                             stringAnswer = "Recursion in file spotted.";
                         }
-                        byte[] answer = stringAnswer.getBytes(StandardCharsets.UTF_8);
+                        byte[] answer = Arrays.copyOf(stringAnswer.getBytes(StandardCharsets.UTF_8), buffSize);
                         ByteBuffer bufferAnswer = ByteBuffer.wrap(answer);
                         bufferAnswer.clear();
                         channel.send(bufferAnswer, address);
@@ -119,6 +116,5 @@ public class ServerMaster {
         } catch (IOException e){
             System.out.println("IOException.");
         }
-
     }
 }
