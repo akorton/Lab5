@@ -65,10 +65,12 @@ public class FileInputMaster extends InputMaster {
      * @param cur_str string of command name and arguments
      * @throws RecursionInFileException thrown if the recursion in file is spotted
      */
-    private String executeCmd(String cur_str) throws RecursionInFileException {
+    private Message<String, ?> executeCmd(String cur_str) throws RecursionInFileException {
         try {
             String[] curLine = cur_str.split(" ");
             String curCmd = curLine[0];
+            Message<String, ?> wrongArg = new Message<>("Wrong argument.");
+            wrongArg.setResult(false);
             switch (curCmd){
                 case "help":
                     if (validateNumberOfArgs(0, curLine))
@@ -109,7 +111,7 @@ public class FileInputMaster extends InputMaster {
                         try{
                             idLong = Long.parseLong(id);
                         } catch (NumberFormatException e){
-                            return "Wrong argument.";
+                            return wrongArg;
                         }
                         return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_BY_ID, idLong));
                     }
@@ -125,7 +127,7 @@ public class FileInputMaster extends InputMaster {
                         try {
                             m = Float.parseFloat(meters);
                         } catch (NumberFormatException e){
-                            return "Wrong argument.";
+                            return wrongArg;
                         }
                         return commandsMaster.executeCommand(new Message<>(CommandTypes.FILTER_GREATER, m));
                     }
@@ -134,7 +136,7 @@ public class FileInputMaster extends InputMaster {
                     if (validateNumberOfArgs(0, curLine)){
                         City c = inputCity();
                         if (c == null)
-                            return "Wrong argument.";
+                            return wrongArg;
                         return commandsMaster.executeCommand(new Message<>(CommandTypes.ADD, c));
                     }
                     break;
@@ -142,7 +144,7 @@ public class FileInputMaster extends InputMaster {
                     if (validateNumberOfArgs(0, curLine)){
                         City c = inputCity();
                         if (c == null)
-                            return "Wrong argument.";
+                            return wrongArg;
                         return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_GREATER, c));
                     }
                     break;
@@ -153,29 +155,39 @@ public class FileInputMaster extends InputMaster {
                         try{
                             idLong = Long.parseLong(id);
                         } catch (NumberFormatException e){
-                            return "Wrong argument.";
+                            return wrongArg;
                         }
                         City c = inputCity();
                         if (c == null)
-                            return "Wrong argument.";
+                            return wrongArg;
                         return commandsMaster.executeCommand(new Message<>(CommandTypes.UPDATE, idLong, c));
                     }
                     break;
                 case "exit":
                     if (validateNumberOfArgs(0, curLine)){
                         exit();
-                        return "Have a good day sir!";
+                        Message<String, ?> message = new Message<>("Have a good day sir!");
+                        message.setResult(false);
+                        return message;
                     }
                     break;
                 default:
-                    return "Command not found.";
+                    Message<String, ?> message = new Message<>("Command not found.");
+                    message.setResult(false);
+                    return message;
             }
         } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
-            return "Command not found.";
+            Message<String, ?> message = new Message<>("Command not found.");
+            message.setResult(false);
+            return message;
         } catch (WrongNumberOfArguments e){
-            return "Wrong number of arguments.";
+            Message<String, ?> message = new Message<>("Wrong number of arguments.");
+            message.setResult(false);
+            return message;
         }
-        return null;
+        Message<String, ?> message = new Message<>("Command not found.");
+        message.setResult(false);
+        return message;
     }
 
     /**

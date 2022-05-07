@@ -1,6 +1,7 @@
 package Lab5.Server.Commands;
 
 import Lab5.CommonStaff.CollectionStaff.City;
+import Lab5.CommonStaff.Others.Message;
 import Lab5.Server.MyCollection;
 
 import java.util.NoSuchElementException;
@@ -11,16 +12,20 @@ public class FilterCommand extends CommandOne<Float> {
         super(collection, arg);
     }
 
-    public String execute() {
+    public Message<String, ?> execute() {
         try {
-            return collection.getMyCollection()
+            Message<String, ?> message = new Message<>(collection.getMyCollection()
                     .stream()
                     .filter((city) -> city.getMetersAboveSeaLevel() > arg)
                     .map(City::toString)
                     .reduce((c1, c2) -> c1 + c2)
-                    .get();
+                    .get());
+            message.setResult(true);
+            return message;
         } catch (NoSuchElementException e){
-            return "No elements in collection.";
+            Message<String, ?> message = new Message<>("No elements in collection.");
+            message.setResult(false);
+            return message;
         }
     }
 }

@@ -4,6 +4,7 @@ package Lab5.Server.Commands;
 import Lab5.CommonStaff.Others.CommandTypes;
 import Lab5.CommonStaff.Others.Message;
 import Lab5.CommonStaff.CollectionStaff.City;
+import Lab5.CommonStaff.Others.User;
 import Lab5.Server.MyCollection;
 import Lab5.Server.RecursionInFileException;
 
@@ -25,21 +26,27 @@ public class CommandsMaster {
         return commandsMaster;
     }
 
-    public String executeCommand(byte[] bytes) throws RecursionInFileException {
+    public Message<String, ?> executeCommand(byte[] bytes) throws RecursionInFileException {
         try {
             ObjectInputStream objectIn = new ObjectInputStream(new ByteArrayInputStream(bytes));
             Message<?, ?> message = (Message<?, ?>) objectIn.readObject();
             return executeCommand(message);
         } catch (IOException e){
-            return "Unable to parse from bytes.";
+            Message<String, ?> mes = new Message<>("Unable to parse from bytes.");
+            mes.setResult(false);
+            return mes;
         } catch (ClassNotFoundException e){
-            return "Class not found exception.";
+            Message<String, ?> mes = new Message<>("Class not found exception.");
+            mes.setResult(false);
+            return mes;
         }
     }
 
 
-    public String executeCommand(Message<?, ?> message) throws RecursionInFileException {
+    public Message<String, ?> executeCommand(Message<?, ?> message) throws RecursionInFileException {
         CommandTypes type = message.getType();
+        Message<String, ?> incorrectCity = new Message<>("Invalid City. Try again.");
+        incorrectCity.setResult(false);
         if (logger != null) logger.info("Command: " + type + " is being executed.");
         switch (type) {
             case HELP:
@@ -61,11 +68,11 @@ public class CommandsMaster {
             case ADD:
                 if (City.validateCity((City) message.getArg())) {
                     return new AddCommand(collection, (City) message.getArg()).execute();
-                } else return "Invalid City. Try again.";
+                } else return incorrectCity;
             case UPDATE:
                 if (City.validateCity((City) message.getArg2())){
                     return new UpdateCommand(collection, (Long) message.getArg(), (City) message.getArg2()).execute();
-                } else return "Invalid City. Try again.";
+                } else return incorrectCity;
             case REMOVE_BY_ID:
                 return new RemoveByIdCommand(collection, (Long) message.getArg()).execute();
             case FILTER_GREATER:
@@ -73,11 +80,15 @@ public class CommandsMaster {
             case REMOVE_GREATER:
                 if (City.validateCity((City) message.getArg())){
                     return new RemoveGreaterCommand(collection, (City) message.getArg()).execute();
-                } else return "Invalid City. Try again.";
+                } else return incorrectCity;
             case EXECUTE_SCRIPT:
                 return new ExecuteScriptCommand(collection, (String) message.getArg()).execute();
+            case REGISTER:
+                return new RegisterCommand((User) message.getArg()).execute();
             default:
-                return "Unknown command.";
+                Message<String, ?> message1 = new Message<>("Unknown command.");
+                message1.setResult(false);
+                return message1;
         }
     }
 

@@ -1,5 +1,6 @@
 package Lab5.Server.Commands;
 
+import Lab5.CommonStaff.Others.Message;
 import Lab5.Server.MyCollection;
 
 public abstract class CommandZero extends Command{
@@ -8,5 +9,5 @@ public abstract class CommandZero extends Command{
         super(collection);
     }
 
-    public abstract String execute();
+    public abstract Message<String, ?> execute();
 }

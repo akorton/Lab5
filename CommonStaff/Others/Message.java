@@ -3,10 +3,14 @@ package Lab5.CommonStaff.Others;
 import java.io.Serializable;
 
 public class Message<T, U> implements Serializable {
-    public CommandTypes type;
-    public T arg = null;
-    public U arg2 = null;
+    private CommandTypes type;
+    private boolean result;
+    private T arg = null;
+    private U arg2 = null;
 
+    public Message(){
+
+    }
 
     public Message(CommandTypes type){
         this.type = type;
@@ -22,6 +26,15 @@ public class Message<T, U> implements Serializable {
         this.arg2 = arg2;
     }
 
+    public Message(T arg){
+        this.arg = arg;
+    }
+
+    public  Message(T arg, U arg2){
+        this(arg);
+        this.arg2 = arg2;
+    }
+
     public CommandTypes getType(){
         return type;
     }
@@ -34,13 +47,17 @@ public class Message<T, U> implements Serializable {
         return arg2;
     }
 
-    public Class<?> getArgClass(){
-        return arg.getClass();
-    }
-    public Class<?> getArg2Class(){
-        return arg2.getClass();
+    public void setArg(T arg){
+        this.arg = arg;
     }
 
+    public boolean isResult(){
+        return result;
+    }
+
+    public void setResult(boolean result) {
+        this.result = result;
+    }
 
     public String toString() {
         return "Message{" +

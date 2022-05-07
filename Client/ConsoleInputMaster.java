@@ -1,12 +1,11 @@
 package Lab5.Client;
 
-import Lab5.CommonStaff.Others.CommandTypes;
-import Lab5.CommonStaff.Others.InputMaster;
-import Lab5.CommonStaff.Others.Message;
+import Lab5.CommonStaff.Others.*;
 import Lab5.CommonStaff.CollectionStaff.*;
-import Lab5.CommonStaff.Others.Validatable;
-import Lab5.CommonStaff.Others.Validator;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -27,15 +26,37 @@ public class ConsoleInputMaster extends InputMaster {
      * the main method that runs the input
      */
     public String run() {
-        System.out.println("help : вывести справку по доступным командам");
         while (isRunning) {
             System.out.print("Enter command: ");
             try {
                 executeCmd(scanner.nextLine());
-            } catch (NoSuchElementException | IllegalStateException e){
+            } catch (NoSuchElementException | IllegalStateException e) {
                 System.out.println("Have a good day sir!");
                 break;
             }
+        }
+        return null;
+    }
+
+    private User inputUser() throws NoSuchElementException {
+        System.out.println("Input login:");
+        String name = scanner.nextLine();
+        if (!Validator.validateName(name)){
+            System.out.println("Login should not be empty.");
+            return null;
+        }
+        System.out.println("Input password:");
+        String password = scanner.nextLine();
+        if (!Validator.validateName(password)){
+            System.out.println("Password should not be empty.");
+            return null;
+        }
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
+            byte[] encryptedPassword = messageDigest.digest(password.getBytes(StandardCharsets.UTF_8));
+            return new User(name, encryptedPassword);
+        } catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+            System.out.println("No SHA-512 alg found.");
         }
         return null;
     }
@@ -159,96 +180,114 @@ public class ConsoleInputMaster extends InputMaster {
         try {
             String[] curLine = cur_str.split(" ");
             String curCmd = curLine[0];
-            switch (curCmd){
+            switch (curCmd) {
                 case "help":
                     if (validateNumberOfArgs(0, curLine))
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.HELP)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.HELP)).getArg());
                     break;
                 case "show":
                     if (validateNumberOfArgs(0, curLine))
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.SHOW)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.SHOW)).getArg());
                     break;
                 case "info":
                     if (validateNumberOfArgs(0, curLine))
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.INFO)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.INFO)).getArg());
                     break;
                 case "clear":
                     if (validateNumberOfArgs(0, curLine))
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.CLEAR)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.CLEAR)).getArg());
                     break;
                 case "remove_last":
                     if (validateNumberOfArgs(0, curLine))
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REMOVE_LAST)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REMOVE_LAST)).getArg());
                     break;
                 case "reorder":
                     if (validateNumberOfArgs(0, curLine))
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REORDER)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REORDER)).getArg());
                     break;
                 case "group_counting_by_area":
                     if (validateNumberOfArgs(0, curLine))
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.GROUP_COUNTING)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.GROUP_COUNTING)).getArg());
                     break;
                 case "print_descending":
                     if (validateNumberOfArgs(0, curLine))
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.PRINT_DESCENDING)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.PRINT_DESCENDING)).getArg());
                     break;
                 case "remove_by_id":
                     if (validateNumberOfArgs(1, curLine)) {
                         String id = curLine[1];
                         long idLong;
-                        try{
+                        try {
                             idLong = Long.parseLong(id);
-                        } catch (NumberFormatException e){
+                        } catch (NumberFormatException e) {
                             idLong = Long.parseLong(validateInput("id", Validator::validateLong));
                         }
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REMOVE_BY_ID, idLong)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REMOVE_BY_ID, idLong)).getArg());
                     }
                     break;
                 case "execute_script":
                     if (validateNumberOfArgs(1, curLine))
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.EXECUTE_SCRIPT, curLine[1])));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.EXECUTE_SCRIPT, curLine[1])).getArg());
                     break;
                 case "filter_greater_than_meters_above_sea_level":
-                    if (validateNumberOfArgs(1, curLine)){
+                    if (validateNumberOfArgs(1, curLine)) {
                         String meters = curLine[1];
                         float m;
                         try {
                             m = Float.parseFloat(meters);
-                        } catch (NumberFormatException e){
+                        } catch (NumberFormatException e) {
                             m = Float.parseFloat(validateInput("metersAboveSeaLevel", Validator::validateFloatValue));
                         }
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.FILTER_GREATER, m)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.FILTER_GREATER, m)).getArg());
                     }
                     break;
                 case "add":
-                    if (validateNumberOfArgs(0, curLine)){
+                    if (validateNumberOfArgs(0, curLine)) {
                         City c = inputCity();
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.ADD, c)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.ADD, c)).getArg());
                     }
                     break;
                 case "remove_greater":
-                    if (validateNumberOfArgs(0, curLine)){
+                    if (validateNumberOfArgs(0, curLine)) {
                         City c = inputCity();
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REMOVE_GREATER, c)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.REMOVE_GREATER, c)).getArg());
                     }
                     break;
                 case "update":
-                    if (validateNumberOfArgs(1, curLine)){
+                    if (validateNumberOfArgs(1, curLine)) {
                         String id = curLine[1];
                         long idLong;
-                        try{
+                        try {
                             idLong = Long.parseLong(id);
-                        } catch (NumberFormatException e){
+                        } catch (NumberFormatException e) {
                             idLong = Long.parseLong(validateInput("id", Validator::validateLong));
                         }
                         City c = inputCity();
-                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.UPDATE, idLong, c)));
+                        System.out.println(ClientMaster.sendInfo(new Message<>(CommandTypes.UPDATE, idLong, c)).getArg());
                     }
                     break;
                 case "exit":
-                    if (validateNumberOfArgs(0, curLine)){
+                    if (validateNumberOfArgs(0, curLine)) {
                         exit();
                         System.out.println("Have a good day sir!");
+                    }
+                    break;
+                case "register":
+                    if (validateNumberOfArgs(0, curLine)){
+                        User user = inputUser();
+                        if (user != null) {
+                            String answer = ClientMaster.sendInfo(new Message<>(CommandTypes.REGISTER, user)).getArg();
+                            System.out.println(answer);
+                        }
+                    }
+                    break;
+                case "login":
+                    if (validateNumberOfArgs(0, curLine)){
+                        User user = inputUser();
+                        if (user != null) {
+                            String answer = ClientMaster.sendInfo(new Message<>(CommandTypes.LOGIN, user)).getArg();
+                            System.out.println(answer);
+                        }
                     }
                     break;
                 default:

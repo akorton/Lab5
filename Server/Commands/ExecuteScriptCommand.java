@@ -1,6 +1,7 @@
 package Lab5.Server.Commands;
 
 import Lab5.CommonStaff.CollectionStaff.City;
+import Lab5.CommonStaff.Others.Message;
 import Lab5.Server.FileInputMaster;
 import Lab5.Server.MyCollection;
 import Lab5.Server.RecursionInFileException;
@@ -11,8 +12,10 @@ public class ExecuteScriptCommand extends CommandOne<String>{
         super(collection, arg);
     }
 
-    public String execute() throws RecursionInFileException {
+    public Message<String, ?> execute() throws RecursionInFileException {
         FileInputMaster fileInputMaster = new FileInputMaster(arg);
-        return fileInputMaster.run();
+        Message<String, ?> message = new Message<>(fileInputMaster.run());
+        message.setResult(true);
+        return message;
     }
 }

@@ -15,5 +15,7 @@ public enum CommandTypes {
     REORDER,
     GROUP_COUNTING,
     FILTER_GREATER,
-    PRINT_DESCENDING;
+    PRINT_DESCENDING,
+    REGISTER,
+    LOGIN;
 }

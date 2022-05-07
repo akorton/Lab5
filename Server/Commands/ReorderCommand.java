@@ -1,6 +1,7 @@
 package Lab5.Server.Commands;
 
 import Lab5.CommonStaff.CollectionStaff.City;
+import Lab5.CommonStaff.Others.Message;
 import Lab5.Server.MyCollection;
 
 public class ReorderCommand extends CommandZero{
@@ -9,8 +10,10 @@ public class ReorderCommand extends CommandZero{
         super(collection);
     }
 
-    public String execute(){
+    public Message<String, ?> execute(){
         collection.reorder();
-        return "Successfully reordered.";
+        Message<String, ?> message = new Message<>("Successfully reordered.");
+        message.setResult(true);
+        return message;
     }
 }

@@ -1,6 +1,7 @@
 package Lab5.Server.Commands;
 
 import Lab5.CommonStaff.CollectionStaff.City;
+import Lab5.CommonStaff.Others.Message;
 import Lab5.Server.MyCollection;
 
 public class AddCommand extends CommandOne<City>{
@@ -9,9 +10,11 @@ public class AddCommand extends CommandOne<City>{
         super(collection, arg);
     }
 
-    public String execute(){
+    public Message<String, ?> execute(){
         arg.setId(MyCollection.generateNextId());
         collection.addLast(arg);
-        return "Successfully added.";
+        Message<String, ?> message = new Message<>("Successfully added.");
+        message.setResult(true);
+        return message;
     }
 }

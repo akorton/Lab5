@@ -18,6 +18,7 @@ public class City implements Comparable<City>, Serializable {
     private Climate climate;
     private StandartOfLiving standartOfLiving;
     private Human governor;
+    private int userId;
 
     public City(){
     }
@@ -76,6 +77,10 @@ public class City implements Comparable<City>, Serializable {
 
     public void setId(Long id){
         this.id = id;
+    }
+
+    public void setUserId(int id){
+        this.userId = id;
     }
 
     public String getName() {
