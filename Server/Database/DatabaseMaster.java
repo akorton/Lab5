@@ -1,15 +1,13 @@
 package Lab5.Server.Database;
 
 import Lab5.CommonStaff.CollectionStaff.*;
+import Lab5.CommonStaff.Others.PasswordGenerationException;
 import Lab5.CommonStaff.Others.User;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class DatabaseMaster {
     private static Connection con;
@@ -18,19 +16,22 @@ public class DatabaseMaster {
     private static String heliosUrl = "jdbc:postgresql://pg:5432/studs";
     private static DatabaseMaster databaseMaster = new DatabaseMaster();
 
-    static {
-        setUp();
-    }
-
     private DatabaseMaster(){
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                statement.close();
+                con.close();
+            } catch (SQLException e){
 
+            }
+        }));
     }
     
     public static DatabaseMaster getDatabaseMaster(){
         return databaseMaster;
     }
 
-    private static boolean setUp(){
+    public static boolean setUp(){
         try {
             Properties properties = new Properties();
             properties.setProperty("user", "s336667");
@@ -39,7 +40,8 @@ public class DatabaseMaster {
             String createTableUsers = "CREATE TABLE IF not EXISTS public.users"+
                     "(id INTEGER,"+
                     "login TEXT," +
-                    "password TEXT," +
+                    "password bytea," +
+                    "salt TEXT," +
                     "PRIMARY KEY(id)"+
                     ")";
             Statement st = con.createStatement();
@@ -69,34 +71,55 @@ public class DatabaseMaster {
             st.executeUpdate(createCollectionIdSequence);
             return true;
         } catch (SQLException e){
+            e.printStackTrace();
             System.out.println("Connection with database can not be established.");
             return false;
         }
     }
 
-    public Map<Integer, User> getUsersTable(){
+    public Map<Integer, User> getIdToUsersTable() throws SQLException {
         String getTable = "SELECT * FROM users";
         Map<Integer, User> users = new HashMap<>();
-        try (ResultSet answer = statement.executeQuery(getTable);){
+        try (ResultSet answer = statement.executeQuery(getTable)){
             while (answer.next()){
                 int id = answer.getInt("id");
                 String login = answer.getString("login");
-                String password = answer.getString("password");
-                User user = new User(login, password.getBytes(StandardCharsets.UTF_8));
+                byte[] password = answer.getBytes("password");
+                String salt = answer.getString("salt");
+                User user = new User(login, password, salt);
                 users.put(id, user);
             }
-        } catch (SQLException e){
-            System.out.println("Something wrong with database.");
-            return null;
         }
         return users;
     }
 
-    public LinkedList<City> getCollectionTable(){
+    private Map<User, Integer> getUserToIdTable() throws SQLException {
+        String getTable = "SELECT * FROM users";
+        Map<User, Integer> users = new HashMap<>();
+        try (ResultSet answer = statement.executeQuery(getTable)) {
+            while (answer.next()) {
+                int id = answer.getInt("id");
+                String login = answer.getString("login");
+                byte[] password = answer.getBytes("password");
+                String salt = answer.getString("salt");
+                User user = new User(login, password, salt);
+                users.put(user, id);
+            }
+        }
+        return users;
+    }
+
+    public int getIdByUser(User user) throws SQLException{
+        int result = getUserToIdTable().getOrDefault(user, -1);
+        if (result == -1) throw new SQLException();
+        return result;
+    }
+
+    public LinkedList<City> getCollectionTable() throws SQLException {
         String getTable = "SELECT * FROM collection";
         LinkedList<City> collection = new LinkedList<>();
-        try (ResultSet answer = statement.executeQuery(getTable);){
-            while (answer.next()){
+        try (ResultSet answer = statement.executeQuery(getTable);) {
+            while (answer.next()) {
                 long id = answer.getLong("id");
                 String name = answer.getString("name");
                 double x = answer.getDouble("x");
@@ -117,9 +140,6 @@ public class DatabaseMaster {
                 city.setUserId(userId);
                 collection.add(city);
             }
-        } catch (SQLException e){
-            System.out.println("Something wrong with database.");
-            return null;
         }
         return collection;
     }
@@ -143,19 +163,101 @@ public class DatabaseMaster {
         return ans;
     }
 
-    public boolean insertUser(User user){
-        String insert = "INSERT INTO users VALUES(?, ?, ?)";
-        try {
-            PreparedStatement statement1 = con.prepareStatement(insert);
-            statement1.setInt(1, getNextUserId());
-            statement1.setString(2, user.getName());
-            statement1.setString(3, new String(user.getEncodedPassword()));
-            int result = statement1.executeUpdate();
-            statement1.close();
-            return result != 0;
-        } catch (SQLException e) {
-            System.out.println("No connection with db.");
-            return false;
+    public boolean insertUser(User user) throws SQLException {
+        System.out.println(user);
+        String insert = "INSERT INTO users VALUES(?, ?, ?, ?)";
+        PreparedStatement statement1 = con.prepareStatement(insert);
+        statement1.setInt(1, getNextUserId());
+        statement1.setString(2, user.getName());
+        statement1.setBytes(3, user.getEncodedPassword());
+        statement1.setString(4, user.getSalt());
+        int result = statement1.executeUpdate();
+        statement1.close();
+        statement1.close();
+        return result != 0;
+    }
+
+    public boolean insertCity(City city) throws SQLException {
+        String insertCity = "INSERT INTO collection VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        city.setId(getNextCollectionId());
+        PreparedStatement statement1 = con.prepareStatement(insertCity);
+        statement1.setLong(1, city.getId());
+        statement1.setString(2, city.getName());
+        statement1.setDouble(3, city.getCoordinates().getX());
+        statement1.setFloat(4, city.getCoordinates().getY());
+        statement1.setString(5, city.getCreationDate().toString());
+        statement1.setDouble(6, city.getArea());
+        statement1.setLong(7, city.getPopulation());
+        statement1.setFloat(8, city.getMetersAboveSeaLevel());
+        statement1.setFloat(9, city.getAgglomeration());
+        statement1.setString(10, city.getClimate().toString());
+        statement1.setString(11, city.getStandartOfLiving().toString());
+        statement1.setInt(12, city.getGovernor().getAge());
+        statement1.setString(13, city.getGovernor().getBirthday().toString());
+        statement1.setInt(14, city.getUserId());
+        int result = statement1.executeUpdate();
+        statement1.close();
+        return result != 0;
+    }
+
+    public boolean containsId(long id) throws SQLException{
+        LinkedList<City> collection = getCollectionTable();
+        for (City city: collection){
+            if (city.getId() == id){
+                return true;
+            }
         }
+        return false;
+    }
+
+    public City getCityById(long id) throws SQLException{
+        LinkedList<City> collection = getCollectionTable();
+        for (City city: collection){
+            if (city.getId() == id){
+                return city;
+            }
+        }
+        return null;
+    }
+
+    public boolean removeCityById(long id) throws SQLException{
+        String deleteCity = "DELETE from collection WHERE id = ?";
+        PreparedStatement st = con.prepareStatement(deleteCity);
+        st.setLong(1, id);
+        int result = st.executeUpdate();
+        st.close();
+        return result != 0;
+    }
+
+    public boolean removeAll(Collection<City> cities) throws SQLException{
+        for (City city: cities){
+            if (!removeCityById(city.getId())){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean update(Long id, City newCity) throws SQLException{
+        String update = "UPDATE collection SET name=?,x=?,y=?,creationTime=?," +
+                "area=?,population=?,metersAbove=?,agglomeration=?,climate=?,standart=?," +
+                "age=?,birthday=? WHERE id=?";
+        PreparedStatement statement1 = con.prepareStatement(update);
+        statement1.setString(1, newCity.getName());
+        statement1.setDouble(2, newCity.getCoordinates().getX());
+        statement1.setFloat(3, newCity.getCoordinates().getY());
+        statement1.setString(4, newCity.getCreationDate().toString());
+        statement1.setDouble(5, newCity.getArea());
+        statement1.setLong(6, newCity.getPopulation());
+        statement1.setFloat(7, newCity.getMetersAboveSeaLevel());
+        statement1.setFloat(8, newCity.getAgglomeration());
+        statement1.setString(9, newCity.getClimate().toString());
+        statement1.setString(10,newCity.getStandartOfLiving().toString());
+        statement1.setInt(11, newCity.getGovernor().getAge());
+        statement1.setString(12,newCity.getGovernor().getBirthday().toString());
+        statement1.setLong(13, id);
+        int result = statement1.executeUpdate();
+        statement1.close();
+        return result != 0;
     }
 }

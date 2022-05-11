@@ -52,13 +52,10 @@ public class ConsoleInputMaster extends InputMaster {
             return null;
         }
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
-            byte[] encryptedPassword = messageDigest.digest(password.getBytes(StandardCharsets.UTF_8));
-            return new User(name, encryptedPassword);
-        } catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-            System.out.println("No SHA-512 alg found.");
+            return new User(name, password);
+        } catch (PasswordGenerationException e){
+            return null;
         }
-        return null;
     }
 
     /**
@@ -276,7 +273,9 @@ public class ConsoleInputMaster extends InputMaster {
                     if (validateNumberOfArgs(0, curLine)){
                         User user = inputUser();
                         if (user != null) {
-                            String answer = ClientMaster.sendInfo(new Message<>(CommandTypes.REGISTER, user)).getArg();
+                            Message<User, ?> message = new Message<>(CommandTypes.REGISTER);
+                            message.setArg(user);
+                            String answer = ClientMaster.sendInfo(message).getArg();
                             System.out.println(answer);
                         }
                     }
@@ -285,7 +284,9 @@ public class ConsoleInputMaster extends InputMaster {
                     if (validateNumberOfArgs(0, curLine)){
                         User user = inputUser();
                         if (user != null) {
-                            String answer = ClientMaster.sendInfo(new Message<>(CommandTypes.LOGIN, user)).getArg();
+                            Message<User, ?> message = new Message<>(CommandTypes.LOGIN);
+                            message.setArg(user);
+                            String answer = ClientMaster.sendInfo(message).getArg();
                             System.out.println(answer);
                         }
                     }

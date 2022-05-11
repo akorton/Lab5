@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * class that encapsulates all the operations upon the collection
@@ -114,10 +115,8 @@ public class MyCollection {
      * removes element with the given id from collection
      * @param id id of element to remove
      */
-    public boolean removeCityById(Long id){
-        if (!containsId(id)) return false;
+    public void removeCityById(Long id){
         myCollection.remove(getCityById(id));
-        return true;
     }
 
     private City getCityById(Long id){
@@ -142,7 +141,7 @@ public class MyCollection {
 
     /**
      * removes all given elements
-     * @param cities elements hto remove
+     * @param cities elements to remove
      */
     public void removeAll(Collection<City> cities) {myCollection.removeAll(cities);}
 

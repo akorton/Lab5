@@ -5,6 +5,7 @@ import Lab5.CommonStaff.Others.Validator;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 public class City implements Comparable<City>, Serializable {
     private Long id;
@@ -125,6 +126,10 @@ public class City implements Comparable<City>, Serializable {
         return standartOfLiving;
     }
 
+    public int getUserId(){
+        return userId;
+    }
+
     public int compareTo(City c1){
         return governor.getAge() - c1.getGovernor().getAge();
     }
@@ -142,6 +147,7 @@ public class City implements Comparable<City>, Serializable {
         s += "  climate: " +climate + "\n";
         s += "  standartOfLiving: " + standartOfLiving + "\n";
         s += "  governor: [age: " + governor.getAge() + ", birthday: " + governor.getBirthday().toString().split("T")[0] + "]\n";
+        s += "  userId: " + userId + "\n";
         s += "}";
         return s;
     }
@@ -158,5 +164,16 @@ public class City implements Comparable<City>, Serializable {
                 Validator.validatePopulation(city.getPopulation().toString()) &&
                 Validator.validateStandartOfLining(city.getStandartOfLiving().toString()) && Validator.validateFloatValue(String.valueOf(city.getMetersAboveSeaLevel())) &&
                 Validator.validateFloatValue(String.valueOf(city.getAgglomeration())) && Validator.validateZonedDateTime(city.getCreationDate().toString());
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        City city = (City) o;
+        return Objects.equals(id, city.getId());
+    }
+
+    public int hashCode() {
+        return Objects.hash(id, name, coordinates, creationDate, area, population, metersAboveSeaLevel, agglomeration, climate, standartOfLiving, governor, userId);
     }
 }

@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.*;
 
@@ -20,7 +21,12 @@ public class ServerMaster {
     private static Logger logger;
     private static int port;
     static {
-        DatabaseMaster.getDatabaseMaster();
+        try {
+            DatabaseMaster.setUp();
+            myCollection.addAll(DatabaseMaster.getDatabaseMaster().getCollectionTable());
+        } catch (SQLException e){
+            System.out.println("No connection with database.");
+        }
         try {
             port = Integer.parseInt(System.getenv("JAVA_PORT"));
         } catch (NumberFormatException e){
@@ -71,6 +77,9 @@ public class ServerMaster {
                         Message<String, ?> answer = new Message<>();
                         try {
                             answer = commandsMaster.executeCommand(message);
+                            if (answer.getArg().length() > buffSize){
+                                answer.setArg(answer.getArg().substring(0, buffSize - 1000));
+                            }
                         } catch (RecursionInFileException e) {
                             answer.setArg("Recursion in file spotted.");
                         }
@@ -85,6 +94,13 @@ public class ServerMaster {
                         ObjectOutputStream objectArray = new ObjectOutputStream(byteArray);
                         objectArray.writeObject(((AttachedObject) sk.attachment()).getAnswer());
                         byte[] answerByte = byteArray.toByteArray();
+                        if (answerByte.length > buffSize){
+                            byte[] answerByte1 = new byte[buffSize];
+                            for (int i = 0; i < buffSize;i++){
+                                answerByte1[i] = answerByte[i];
+                            }
+                            answerByte = answerByte1;
+                        }
                         ByteBuffer bufferAnswer = ByteBuffer.wrap(answerByte);
                         bufferAnswer.clear();
                         DatagramChannel sock = (DatagramChannel) sk.channel();
@@ -101,6 +117,7 @@ public class ServerMaster {
             e.printStackTrace();
         } catch (IOException e){
             System.out.println("IOException.");
+            e.printStackTrace();
         }
     }
 }

@@ -1,6 +1,7 @@
 package Lab5.Server.Commands;
 
 import Lab5.CommonStaff.Others.Message;
+import Lab5.CommonStaff.Others.User;
 import Lab5.Server.MyCollection;
 
 import java.util.HashMap;
@@ -8,11 +9,12 @@ import java.util.Map;
 
 public class GroupCommand extends CommandZero{
 
-    public GroupCommand(MyCollection collection){
-        super(collection);
+    public GroupCommand(MyCollection collection, User user){
+        super(collection, user);
     }
 
-    public Message<String, ?> execute(){
+    public Message<String, ?> execute() throws UnauthorizedException {
+        checkUnauthorized();
         if (collection.getSize() == 0){
             Message<String, ?> message = new Message<>("No elements in collection.");
             message.setResult(false);

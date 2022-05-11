@@ -40,6 +40,7 @@ public class ClientMaster {
     public static Message<String, ?> sendInfo(Message<?, ?> message){
         byte[] mes;
         boolean authorizationFl = message.getType().equals(CommandTypes.LOGIN) || message.getType().equals(CommandTypes.REGISTER);
+        message.setUser(user);
         try{
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream(buffSize);
             ObjectOutputStream objectOut = new ObjectOutputStream(byteOut);
@@ -67,19 +68,14 @@ public class ClientMaster {
                 ByteArrayInputStream byteInput = new ByteArrayInputStream(ans);
                 ObjectInputStream objectInput = new ObjectInputStream(byteInput);
                 Message<String, ?> answerMes = (Message<String, ?>) objectInput.readObject();
-                if (answerMes.getArg().indexOf(0) == -1  && answerMes.getArg().getBytes(StandardCharsets.UTF_8).length == buffSize) {
+                if (answerMes.getArg().indexOf(0) == -1  && answerMes.getArg().getBytes(StandardCharsets.UTF_8).length > buffSize - 2000) {
                     answerMes.setArg(answerMes.getArg() + "\nWarning!\nThe answer is too large, so it is most likely incomplete!");
                     answerMes.setResult(false);
                     return answerMes;
                 }
-                answerMes.setArg(answerMes.getArg());
-                if (authorizationFl){
-                    if (message.isResult()) {
-                        user = (User) answerMes.getArg2();
-                        answerMes.setArg(answerMes.getArg() + "\nPrint help to see the list of all available commands.");
-                    }
-                } else{
-                    answerMes.setArg("Reminding you that only 'register' and 'login' commands are available while unauthorized.");
+                if (authorizationFl && answerMes.isResult()){
+                    user = (User) message.getArg();
+                    answerMes.setArg(answerMes.getArg() + "\nPrint help to see the list of all available commands.");
                 }
                 return answerMes;
             } catch (SocketTimeoutException e){
@@ -96,7 +92,8 @@ public class ClientMaster {
             answerMes.setResult(false);
             return answerMes;
         } catch (IOException e){
-            Message<String, ?> answerMes = new Message<>("IOException.");
+            e.printStackTrace();
+            Message<String, ?> answerMes = new Message<>("Cannot understand server's respond.");
             answerMes.setResult(false);
             return answerMes;
         }

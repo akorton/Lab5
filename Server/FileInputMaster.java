@@ -17,9 +17,15 @@ public class FileInputMaster extends InputMaster {
     private final CommandsMaster commandsMaster = CommandsMaster.getCommandsMaster();
     private boolean isRunning = true;
     private String path;
+    private User user;
 
     public FileInputMaster(String path){
         this.path = path;
+    }
+
+    public FileInputMaster(String path, User user){
+        this(path);
+        this.user = user;
     }
 
     public FileInputMaster(InputStreamReader inputStreamReader){
@@ -74,35 +80,35 @@ public class FileInputMaster extends InputMaster {
             switch (curCmd){
                 case "help":
                     if (validateNumberOfArgs(0, curLine))
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.HELP));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.HELP, user));
                     break;
                 case "show":
                     if (validateNumberOfArgs(0, curLine))
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.SHOW));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.SHOW, user));
                     break;
                 case "info":
                     if (validateNumberOfArgs(0, curLine))
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.INFO));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.INFO, user));
                     break;
                 case "clear":
                     if (validateNumberOfArgs(0, curLine))
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.CLEAR));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.CLEAR, user));
                     break;
                 case "remove_last":
                     if (validateNumberOfArgs(0, curLine))
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_LAST));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_LAST, user));
                     break;
                 case "reorder":
                     if (validateNumberOfArgs(0, curLine))
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REORDER));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REORDER, user));
                     break;
                 case "group_counting_by_area":
                     if (validateNumberOfArgs(0, curLine))
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.GROUP_COUNTING));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.GROUP_COUNTING, user));
                     break;
                 case "print_descending":
                     if (validateNumberOfArgs(0, curLine))
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.PRINT_DESCENDING));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.PRINT_DESCENDING, user));
                     break;
                 case "remove_by_id":
                     if (validateNumberOfArgs(1, curLine)) {
@@ -113,12 +119,12 @@ public class FileInputMaster extends InputMaster {
                         } catch (NumberFormatException e){
                             return wrongArg;
                         }
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_BY_ID, idLong));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_BY_ID, idLong, user));
                     }
                     break;
                 case "execute_script":
                     if (validateNumberOfArgs(1, curLine))
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.EXECUTE_SCRIPT, curLine[1]));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.EXECUTE_SCRIPT, curLine[1], user));
                     break;
                 case "filter_greater_than_meters_above_sea_level":
                     if (validateNumberOfArgs(1, curLine)){
@@ -129,7 +135,7 @@ public class FileInputMaster extends InputMaster {
                         } catch (NumberFormatException e){
                             return wrongArg;
                         }
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.FILTER_GREATER, m));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.FILTER_GREATER, m, user));
                     }
                     break;
                 case "add":
@@ -137,7 +143,7 @@ public class FileInputMaster extends InputMaster {
                         City c = inputCity();
                         if (c == null)
                             return wrongArg;
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.ADD, c));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.ADD, c, user));
                     }
                     break;
                 case "remove_greater":
@@ -145,7 +151,7 @@ public class FileInputMaster extends InputMaster {
                         City c = inputCity();
                         if (c == null)
                             return wrongArg;
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_GREATER, c));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.REMOVE_GREATER, c, user));
                     }
                     break;
                 case "update":
@@ -160,7 +166,7 @@ public class FileInputMaster extends InputMaster {
                         City c = inputCity();
                         if (c == null)
                             return wrongArg;
-                        return commandsMaster.executeCommand(new Message<>(CommandTypes.UPDATE, idLong, c));
+                        return commandsMaster.executeCommand(new Message<>(CommandTypes.UPDATE, idLong, c, user));
                     }
                     break;
                 case "exit":
