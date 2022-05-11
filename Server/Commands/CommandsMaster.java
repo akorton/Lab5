@@ -10,7 +10,6 @@ import Lab5.Server.RecursionInFileException;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
@@ -18,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class CommandsMaster {
     private static final MyCollection collection = MyCollection.getCollection();
-    private Logger logger;
+    private static Logger logger;
     private static final CommandsMaster commandsMaster = new CommandsMaster();
 
     private CommandsMaster(){
@@ -112,6 +111,6 @@ public class CommandsMaster {
     }
 
     public void setLogger(Logger logger){
-        this.logger = logger;
+        CommandsMaster.logger = logger;
     }
 }
