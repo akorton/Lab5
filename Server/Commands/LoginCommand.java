@@ -22,7 +22,8 @@ public class LoginCommand extends CommandOne<User>{
             arg.encodePassword();
             if (arg.equals(entry.getValue())){
                 String yourUserId = "Your user id: " + entry.getKey();
-                Message<String, ?> message = new Message<>("Successfully logged in.\n" + yourUserId);
+                Message<String, User> message = new Message<>("Successfully logged in.\n" + yourUserId);
+                message.serArg2(arg);
                 message.setResult(true);
                 return message;
             } else if (arg.getName().equals(entry.getValue().getName())){

@@ -67,6 +67,10 @@ public class Message<T, U> implements Serializable {
         this.arg = arg;
     }
 
+    public void serArg2(U arg){
+        this.arg2 = arg;
+    }
+
     public boolean isResult(){
         return result;
     }

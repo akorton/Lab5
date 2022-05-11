@@ -26,7 +26,8 @@ public class RegisterCommand extends CommandOne<User>{
         }
         if (DatabaseMaster.getDatabaseMaster().insertUser(arg)) {
             String yourUserId = "Your user id: " + DatabaseMaster.getDatabaseMaster().getIdByUser(arg);
-            Message<String, ?> message = new Message<>("Registration was successful.\n" + yourUserId);
+            Message<String, User> message = new Message<>("Registration was successful.\n" + yourUserId);
+            message.serArg2(arg);
             message.setResult(true);
             return message;
         }

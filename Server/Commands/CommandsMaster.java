@@ -36,7 +36,6 @@ public class CommandsMaster {
         } catch (IOException e){
             Message<String, ?> mes = new Message<>("Unable to parse from bytes.");
             mes.setResult(false);
-            e.printStackTrace();
             return mes;
         } catch (ClassNotFoundException e){
             Message<String, ?> mes = new Message<>("Class not found exception.");

@@ -51,7 +51,7 @@ public class FileInputMaster extends InputMaster {
             getFilesStack().add(file.getAbsolutePath());
             String curCmd = inputLine();
             while (!curCmd.isEmpty() && isRunning){
-                result.append(executeCmd(curCmd));
+                result.append(executeCmd(curCmd).getArg());
                 result.append("\n");
                 curCmd = inputLine();
             }
