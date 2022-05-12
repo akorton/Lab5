@@ -10,7 +10,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 
-public class Cliem {
+public class CM2 {
     private static InetSocketAddress socketAddress;
     private static int port;
     private static User user;
@@ -37,7 +37,7 @@ public class Cliem {
 //            System.out.println("You have not been authorized.\nPls try again.");
 //        }
         try {
-            User user1 = new User("name1", "password1");
+            User user1 = new User("name2", "password2");
             Message<User, ?> message = new Message<>(CommandTypes.LOGIN);
             message.setArg(user1);
             sendInfo(message);
@@ -46,7 +46,7 @@ public class Cliem {
         }
         for (int i = 0; i < 25; i++) {
             sendInfo(new Message<>(CommandTypes.EXECUTE_SCRIPT, "src\\Lab5\\Server\\Files\\script1"));
-            System.out.println("Request #" + (i + 1) + " in thread1 finished.");
+            System.out.println("Request #" + (i + 1) + " in thread2 finished.");
         }
         sendInfo(new Message<>(CommandTypes.CLEAR));
 

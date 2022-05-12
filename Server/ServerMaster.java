@@ -55,7 +55,9 @@ public class ServerMaster {
 
     private static void start(){
         logger.info("Server is up.");
-        ExecutorService service = Executors.newFixedThreadPool(3);
+        ExecutorService writeService = Executors.newFixedThreadPool(5);
+        ForkJoinPool readPool = ForkJoinPool.commonPool();
+        ForkJoinPool proceedPool = ForkJoinPool.commonPool();
         try {
             SocketAddress address = new InetSocketAddress(port);
             DatagramChannel channel = DatagramChannel.open();
@@ -72,19 +74,27 @@ public class ServerMaster {
                     if (sk.isValid()) {
                         if (sk.isReadable()) {
                             logger.info("New message on server.");
+                            sk.interestOpsAnd(~SelectionKey.OP_READ);
                             //READ
-                            DatagramChannel ch = (DatagramChannel) sk.channel();
-                            ReadResult readResult = read(ch);
+                            ForkJoinTask<ReadResult> readTask = new RecursiveTask<>() {
+                                protected ReadResult compute() {
+                                    return read(sk);
+                                }
+                            };
+                            ReadResult readResult = readPool.invoke(readTask);
                             //PROCEED
-                            SocketAddress curAdr = readResult.getAddress();
-                            byte[] message = readResult.getMessage();
-                            proceed(message, curAdr, sk);
+                            ForkJoinTask<Void> proceedTask = new RecursiveAction() {
+                                protected void compute() {
+                                    proceed(readResult, sk);
+                                }
+                            };
+                            proceedPool.invoke(proceedTask);
                         }
                         if (sk.isWritable()) {
                             //WRITE
                             sk.interestOpsAnd(~SelectionKey.OP_WRITE);
                             Runnable writeTask = () -> write(sk);
-                            service.submit(writeTask);
+                            writeService.submit(writeTask);
                         }
                     }
                 }
@@ -114,17 +124,19 @@ public class ServerMaster {
             DatagramChannel sock = (DatagramChannel) sk.channel();
             sock.send(bufferAnswer, ((AttachedObject) sk.attachment()).getAdr());
             sock.configureBlocking(false);
-            SelectionKey key = sock.register(sk.selector(), SelectionKey.OP_READ);
-            sk.selector().wakeup();
+            sock.register(sk.selector(), SelectionKey.OP_READ);
             logger.info("Answer send back.");
         } catch (SocketException e){
             System.out.println("Socket exception.");
         } catch (IOException e){
             System.out.println("IOException.");
+        } finally {
+            sk.selector().wakeup();
         }
     }
 
-    private static ReadResult read(DatagramChannel channel){
+    private static ReadResult read(SelectionKey sk){
+        DatagramChannel channel = (DatagramChannel) sk.channel();
         byte[] message = new byte[buffSize];
         ByteBuffer buffer = ByteBuffer.wrap(message);
         buffer.clear();
@@ -137,7 +149,9 @@ public class ServerMaster {
         }
     }
 
-    private static void proceed(byte[] message, SocketAddress curAdr, SelectionKey sk){
+    private static void proceed(ReadResult readResult, SelectionKey sk){
+        SocketAddress curAdr = readResult.getAddress();
+        byte[] message = readResult.getMessage();
         DatagramChannel ch = (DatagramChannel) sk.channel();
         Message<String, ?> answer = new Message<>();
         try {
@@ -154,6 +168,10 @@ public class ServerMaster {
             ch.register(sk.selector(), SelectionKey.OP_WRITE, curObj);
         } catch (IOException e){
             System.out.println("IOException.");
+        } catch (NullPointerException e){
+            System.out.println("NullPointerException.");
+        } finally {
+            sk.selector().wakeup();
         }
     }
 }

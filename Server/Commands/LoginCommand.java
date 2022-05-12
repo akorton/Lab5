@@ -27,7 +27,6 @@ public class LoginCommand extends CommandOne<User>{
                 message.setResult(true);
                 return message;
             } else if (arg.getName().equals(entry.getValue().getName())){
-                System.out.println();
                 Message<String, ?> message = new Message<>("Incorrect password.");
                 message.setResult(false);
                 return message;

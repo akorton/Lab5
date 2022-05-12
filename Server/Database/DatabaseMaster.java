@@ -164,7 +164,6 @@ public class DatabaseMaster {
     }
 
     public boolean insertUser(User user) throws SQLException {
-        System.out.println(user);
         String insert = "INSERT INTO users VALUES(?, ?, ?, ?)";
         PreparedStatement statement1 = con.prepareStatement(insert);
         statement1.setInt(1, getNextUserId());
