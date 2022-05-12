@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * class that encapsulates all the operations upon the collection
@@ -16,6 +18,7 @@ public class MyCollection {
     private LinkedList<City> myCollection = new LinkedList<>();
     private final String creationTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis());
     private static final MyCollection collection = new MyCollection();
+    private static final Lock lock = new ReentrantLock();
 
     private MyCollection(){}
 
@@ -30,22 +33,30 @@ public class MyCollection {
     public Class getType(){return myCollection.getClass();}
 
     public int getSize(){
-        return myCollection.size();
+        lock.lock();
+        try {
+            return myCollection.size();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public City getFirstElement(){
-        return getSize() > 0 ? myCollection.getFirst() : null;
+        lock.lock();
+        try {
+            return getSize() > 0 ? myCollection.getFirst() : null;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public City getLastElement(){
-        return getSize() > 0 ? myCollection.getLast() : null;
-    }
-
-    /**
-     * clears collection
-     */
-    public void clearCollection(){
-        myCollection.clear();
+        lock.lock();
+        try {
+            return getSize() > 0 ? myCollection.getLast() : null;
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -53,16 +64,26 @@ public class MyCollection {
      * @return true if the element was removed else false
      */
     public boolean removeLast(){
-        int size = getSize();
-        if (size > 0) myCollection.removeLast();
-        return size > 0;
+        lock.lock();
+        try {
+            int size = getSize();
+            if (size > 0) myCollection.removeLast();
+            return size > 0;
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
      * @return the copy of the collection
      */
     public LinkedList<City> getMyCollection(){
-        return new LinkedList<>(myCollection);
+        lock.lock();
+        try {
+            return new LinkedList<>(myCollection);
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -70,45 +91,41 @@ public class MyCollection {
      * @param city element to add
      */
     public void addLast(City city){
-        while (containsId(city.getId()) || city.getId() == null){
-            city.setId(generateNextId());
+        lock.lock();
+        try {
+            myCollection.addLast(city);
+        } finally {
+            lock.unlock();
         }
-        myCollection.addLast(city);
     }
 
     public void addAll(Collection<? extends City> cities){
-        for (City city: cities){
-            addLast(city);
-        }
-    }
-
-    /**
-     * check if the element with id is in collection
-     * @param id id to check
-     * @return true if it is in collection else false
-     */
-    private boolean containsId(Long id){
-        for (City city: myCollection){
-            if (city.getId().equals(id)){
-                return true;
+        lock.lock();
+        try {
+            for (City city : cities) {
+                addLast(city);
             }
+        } finally {
+            lock.unlock();
         }
-        return false;
     }
 
     public boolean updateById(Long id, City arg){
-        arg.setId(id);
-        if (!containsId(id)) return false;
         LinkedList<City> newCollection = new LinkedList<>();
-        for (City city: myCollection){
-            if (city.getId().equals(id)){
-                newCollection.add(arg);
-            } else{
-                newCollection.add(city);
+        lock.lock();
+        try {
+            for (City city : myCollection) {
+                if (city.getId().equals(id)) {
+                    newCollection.add(arg);
+                } else {
+                    newCollection.add(city);
+                }
             }
+            myCollection = newCollection;
+            return true;
+        } finally {
+            lock.unlock();
         }
-        myCollection = newCollection;
-        return true;
     }
 
     /**
@@ -116,41 +133,55 @@ public class MyCollection {
      * @param id id of element to remove
      */
     public void removeCityById(Long id){
-        myCollection.remove(getCityById(id));
+        lock.lock();
+        try {
+            myCollection.remove(getCityById(id));
+        } finally {
+            lock.unlock();
+        }
     }
 
     private City getCityById(Long id){
-        for (City city: myCollection){
-            if (city.getId().equals(id)){
-                return city;
+        lock.lock();
+        try {
+            for (City city : myCollection) {
+                if (city.getId().equals(id)) {
+                    return city;
+                }
             }
+            return null;
+        } finally {
+            lock.unlock();
         }
-        return null;
     }
 
     /**
-     * changes the order od the elements in collection
+     * changes the order of the elements in collection
      */
     public void reorder(){
         LinkedList<City> newCollection = new LinkedList<>();
-        for (Iterator<City> it = myCollection.descendingIterator(); it.hasNext();){
-            newCollection.add(it.next());
+        lock.lock();
+        try {
+            for (Iterator<City> it = myCollection.descendingIterator(); it.hasNext(); ) {
+                newCollection.add(it.next());
+            }
+            myCollection = newCollection;
+        } finally {
+            lock.unlock();
         }
-        myCollection = newCollection;
     }
 
     /**
      * removes all given elements
      * @param cities elements to remove
      */
-    public void removeAll(Collection<City> cities) {myCollection.removeAll(cities);}
-
-    /**
-     * generates id for the next element
-     * @return id
-     */
-    public static Long generateNextId(){
-        return cur_id++;
+    public void removeAll(Collection<City> cities) {
+        lock.lock();
+        try {
+            myCollection.removeAll(cities);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public String toString(){

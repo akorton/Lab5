@@ -1,13 +1,13 @@
 package Lab5.Server.Database;
 
 import Lab5.CommonStaff.CollectionStaff.*;
-import Lab5.CommonStaff.Others.PasswordGenerationException;
 import Lab5.CommonStaff.Others.User;
 
-import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DatabaseMaster {
     private static Connection con;
@@ -15,16 +15,9 @@ public class DatabaseMaster {
     private static String localUrl = "jdbc:postgresql://localhost:5432/studs";
     private static String heliosUrl = "jdbc:postgresql://pg:5432/studs";
     private static DatabaseMaster databaseMaster = new DatabaseMaster();
+    private static final Lock lock = new ReentrantLock();
 
     private DatabaseMaster(){
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                statement.close();
-                con.close();
-            } catch (SQLException e){
-
-            }
-        }));
     }
     
     public static DatabaseMaster getDatabaseMaster(){
@@ -80,6 +73,7 @@ public class DatabaseMaster {
     public Map<Integer, User> getIdToUsersTable() throws SQLException {
         String getTable = "SELECT * FROM users";
         Map<Integer, User> users = new HashMap<>();
+        lock.lock();
         try (ResultSet answer = statement.executeQuery(getTable)){
             while (answer.next()){
                 int id = answer.getInt("id");
@@ -89,6 +83,8 @@ public class DatabaseMaster {
                 User user = new User(login, password, salt);
                 users.put(id, user);
             }
+        } finally {
+            lock.unlock();
         }
         return users;
     }
@@ -96,6 +92,7 @@ public class DatabaseMaster {
     private Map<User, Integer> getUserToIdTable() throws SQLException {
         String getTable = "SELECT * FROM users";
         Map<User, Integer> users = new HashMap<>();
+        lock.lock();
         try (ResultSet answer = statement.executeQuery(getTable)) {
             while (answer.next()) {
                 int id = answer.getInt("id");
@@ -105,6 +102,8 @@ public class DatabaseMaster {
                 User user = new User(login, password, salt);
                 users.put(user, id);
             }
+        } finally {
+            lock.unlock();
         }
         return users;
     }
@@ -118,6 +117,7 @@ public class DatabaseMaster {
     public LinkedList<City> getCollectionTable() throws SQLException {
         String getTable = "SELECT * FROM collection";
         LinkedList<City> collection = new LinkedList<>();
+        lock.lock();
         try (ResultSet answer = statement.executeQuery(getTable);) {
             while (answer.next()) {
                 long id = answer.getLong("id");
@@ -140,27 +140,39 @@ public class DatabaseMaster {
                 city.setUserId(userId);
                 collection.add(city);
             }
+        } finally {
+            lock.unlock();
         }
         return collection;
     }
 
     public static int getNextUserId() throws SQLException{
         String nextId = "SELECT nextval('userid')";
-        ResultSet res = statement.executeQuery(nextId);
-        res.next();
-        int ans = res.getInt(1);
-        res.close();
-        return ans;
+        lock.lock();
+        try {
+            ResultSet res = statement.executeQuery(nextId);
+            res.next();
+            int ans = res.getInt(1);
+            res.close();
+            return ans;
+        } finally {
+            lock.unlock();
+        }
     }
 
 
     public static long getNextCollectionId() throws SQLException{
         String nextId = "SELECT nextval('collectionid');";
-        ResultSet res = statement.executeQuery(nextId);
-        res.next();
-        long ans = res.getLong(1);
-        res.close();
-        return ans;
+        lock.lock();
+        try {
+            ResultSet res = statement.executeQuery(nextId);
+            res.next();
+            long ans = res.getLong(1);
+            res.close();
+            return ans;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public boolean insertUser(User user) throws SQLException {
@@ -170,10 +182,14 @@ public class DatabaseMaster {
         statement1.setString(2, user.getName());
         statement1.setBytes(3, user.getEncodedPassword());
         statement1.setString(4, user.getSalt());
-        int result = statement1.executeUpdate();
-        statement1.close();
-        statement1.close();
-        return result != 0;
+        lock.lock();
+        try {
+            int result = statement1.executeUpdate();
+            return result != 0;
+        } finally {
+            statement1.close();
+            lock.unlock();
+        }
     }
 
     public boolean insertCity(City city) throws SQLException {
@@ -194,9 +210,14 @@ public class DatabaseMaster {
         statement1.setInt(12, city.getGovernor().getAge());
         statement1.setString(13, city.getGovernor().getBirthday().toString());
         statement1.setInt(14, city.getUserId());
-        int result = statement1.executeUpdate();
-        statement1.close();
-        return result != 0;
+        lock.lock();
+        try {
+            int result = statement1.executeUpdate();
+            return result != 0;
+        } finally {
+            statement1.close();
+            lock.unlock();
+        }
     }
 
     public boolean containsId(long id) throws SQLException{
@@ -223,18 +244,28 @@ public class DatabaseMaster {
         String deleteCity = "DELETE from collection WHERE id = ?";
         PreparedStatement st = con.prepareStatement(deleteCity);
         st.setLong(1, id);
-        int result = st.executeUpdate();
-        st.close();
-        return result != 0;
+        lock.lock();
+        try {
+            int result = st.executeUpdate();
+            return result != 0;
+        } finally {
+            st.close();
+            lock.unlock();
+        }
     }
 
     public boolean removeAll(Collection<City> cities) throws SQLException{
-        for (City city: cities){
-            if (!removeCityById(city.getId())){
-                return false;
+        lock.lock();
+        try {
+            for (City city : cities) {
+                if (!removeCityById(city.getId())) {
+                    return false;
+                }
             }
+            return true;
+        } finally {
+            lock.unlock();
         }
-        return true;
     }
 
     public boolean update(Long id, City newCity) throws SQLException{
@@ -255,8 +286,13 @@ public class DatabaseMaster {
         statement1.setInt(11, newCity.getGovernor().getAge());
         statement1.setString(12,newCity.getGovernor().getBirthday().toString());
         statement1.setLong(13, id);
-        int result = statement1.executeUpdate();
-        statement1.close();
-        return result != 0;
+        lock.lock();
+        try {
+            int result = statement1.executeUpdate();
+            return result != 0;
+        } finally {
+            statement1.close();
+            lock.unlock();
+        }
     }
 }

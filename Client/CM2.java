@@ -44,10 +44,13 @@ public class CM2 {
         } catch (PasswordGenerationException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < 25; i++) {
+        sendInfo(new Message<>(CommandTypes.CLEAR));
+        sendInfo(new Message<>(CommandTypes.CLEAR));
+        for (int i = 0; i < 10; i++) {
             sendInfo(new Message<>(CommandTypes.EXECUTE_SCRIPT, "src\\Lab5\\Server\\Files\\script1"));
             System.out.println("Request #" + (i + 1) + " in thread2 finished.");
         }
+        sendInfo(new Message<>(CommandTypes.CLEAR));
         sendInfo(new Message<>(CommandTypes.CLEAR));
 
         System.out.println(System.currentTimeMillis() - start_time);

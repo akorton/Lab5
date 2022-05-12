@@ -11,6 +11,9 @@ import java.nio.channels.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.*;
 
 public class ServerMaster {
@@ -81,11 +84,11 @@ public class ServerMaster {
                                     return read(sk);
                                 }
                             };
-                            ReadResult readResult = readPool.invoke(readTask);
+                            readPool.invoke(readTask);
                             //PROCEED
                             ForkJoinTask<Void> proceedTask = new RecursiveAction() {
                                 protected void compute() {
-                                    proceed(readResult, sk);
+                                    proceed(readTask, sk);
                                 }
                             };
                             proceedPool.invoke(proceedTask);
@@ -149,24 +152,31 @@ public class ServerMaster {
         }
     }
 
-    private static void proceed(ReadResult readResult, SelectionKey sk){
-        SocketAddress curAdr = readResult.getAddress();
-        byte[] message = readResult.getMessage();
-        DatagramChannel ch = (DatagramChannel) sk.channel();
-        Message<String, ?> answer = new Message<>();
+    private static void proceed(Future<ReadResult> futureReadResult, SelectionKey sk){
+        ReadResult readResult = null;
         try {
-            answer = commandsMaster.executeCommand(message);
-            if (answer.getArg().length() > buffSize){
-                answer.setArg(answer.getArg().substring(0, buffSize - 1000));
-            }
-        } catch (RecursionInFileException e) {
-            answer.setArg("Recursion in file spotted.");
+            while (!futureReadResult.isDone()) {}
+            readResult = futureReadResult.get();
+        } catch (InterruptedException | ExecutionException e) {
+            System.out.println("Future has not come(");
         }
-        AttachedObject curObj = new AttachedObject(curAdr, answer);
         try {
+            SocketAddress curAdr = readResult.getAddress();
+            byte[] message = readResult.getMessage();
+            DatagramChannel ch = (DatagramChannel) sk.channel();
+            Message<String, ?> answer = new Message<>();
+            try {
+                answer = commandsMaster.executeCommand(message);
+                if (answer.getArg().length() > buffSize) {
+                    answer.setArg(answer.getArg().substring(0, buffSize - 1000));
+                }
+            } catch (RecursionInFileException e) {
+                answer.setArg("Recursion in file spotted.");
+            }
+            AttachedObject curObj = new AttachedObject(curAdr, answer);
             ch.configureBlocking(false);
             ch.register(sk.selector(), SelectionKey.OP_WRITE, curObj);
-        } catch (IOException e){
+        }catch (IOException e){
             System.out.println("IOException.");
         } catch (NullPointerException e){
             System.out.println("NullPointerException.");
