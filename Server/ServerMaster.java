@@ -77,9 +77,9 @@ public class ServerMaster {
                     if (sk.isValid()) {
                         if (sk.isReadable()) {
                             logger.info("New message on server.");
-                            sk.interestOpsAnd(~SelectionKey.OP_READ);
+                            sk.interestOps(sk.interestOps() & ~SelectionKey.OP_READ);
                             //READ
-                            ForkJoinTask<ReadResult> readTask = new RecursiveTask<>() {
+                            ForkJoinTask<ReadResult> readTask = new RecursiveTask<ReadResult>() {
                                 protected ReadResult compute() {
                                     return read(sk);
                                 }
@@ -95,7 +95,7 @@ public class ServerMaster {
                         }
                         if (sk.isWritable()) {
                             //WRITE
-                            sk.interestOpsAnd(~SelectionKey.OP_WRITE);
+                            sk.interestOps(sk.interestOps() & ~SelectionKey.OP_WRITE);
                             Runnable writeTask = () -> write(sk);
                             writeService.submit(writeTask);
                         }

@@ -29,8 +29,9 @@ public class DatabaseMaster {
             Properties properties = new Properties();
             properties.setProperty("user", "s336667");
             properties.setProperty("password", "jto371");
+            Class.forName("org.postgresql.Driver");
             con = DriverManager.getConnection(localUrl, properties);
-            String createTableUsers = "CREATE TABLE IF not EXISTS public.users"+
+            String createTableUsers = "CREATE TABLE IF not EXISTS users"+
                     "(id INTEGER,"+
                     "login TEXT," +
                     "password bytea," +
@@ -40,7 +41,7 @@ public class DatabaseMaster {
             Statement st = con.createStatement();
             statement = st;
             st.executeUpdate(createTableUsers);
-            String createTableCollection = "CREATE TABLE IF not EXISTS public.collection"+
+            String createTableCollection = "CREATE TABLE IF not EXISTS collection"+
                     "(id BIGINT,"+
                     "name TEXT," +
                     "x FLOAT," +
@@ -63,7 +64,7 @@ public class DatabaseMaster {
             String createCollectionIdSequence = "CREATE SEQUENCE IF not EXISTS collectionId START WITH 1;";
             st.executeUpdate(createCollectionIdSequence);
             return true;
-        } catch (SQLException e){
+        } catch (SQLException | ClassNotFoundException e){
             e.printStackTrace();
             System.out.println("Connection with database can not be established.");
             return false;
