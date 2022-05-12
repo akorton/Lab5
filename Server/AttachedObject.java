@@ -20,4 +20,8 @@ public class AttachedObject {
     public SocketAddress getAdr() {
         return adr;
     }
+
+    public String toString(){
+        return answer.getArg();
+    }
 }

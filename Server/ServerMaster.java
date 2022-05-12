@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.logging.*;
 
 public class ServerMaster {
@@ -54,6 +55,7 @@ public class ServerMaster {
 
     private static void start(){
         logger.info("Server is up.");
+        ExecutorService service = Executors.newFixedThreadPool(3);
         try {
             SocketAddress address = new InetSocketAddress(port);
             DatagramChannel channel = DatagramChannel.open();
@@ -61,63 +63,97 @@ public class ServerMaster {
             channel.bind(address);
             Selector selector = Selector.open();
             channel.register(selector, SelectionKey.OP_READ);
-            while (selector.select() > 0){
-                Iterator<SelectionKey> it = selector.selectedKeys().iterator();
-                while (it.hasNext()){
+            while (true){
+                if (selector.select() == 0) continue;
+                Set<SelectionKey> keySet = selector.selectedKeys();
+                for (Iterator<SelectionKey> it = keySet.iterator(); it.hasNext();) {
                     SelectionKey sk = it.next();
-                    if (sk.isReadable()) {
-                        logger.info("New message on server.");
-                        //READ
-                        byte[] message = new byte[buffSize];
-                        ByteBuffer buffer = ByteBuffer.wrap(message);
-                        buffer.clear();
-                        DatagramChannel sock = (DatagramChannel) sk.channel();
-                        SocketAddress curAdr =  sock.receive(buffer);
-                        //PROCEED
-                        Message<String, ?> answer = new Message<>();
-                        try {
-                            answer = commandsMaster.executeCommand(message);
-                            if (answer.getArg().length() > buffSize){
-                                answer.setArg(answer.getArg().substring(0, buffSize - 1000));
-                            }
-                        } catch (RecursionInFileException e) {
-                            answer.setArg("Recursion in file spotted.");
+                    it.remove();
+                    if (sk.isValid()) {
+                        if (sk.isReadable()) {
+                            logger.info("New message on server.");
+                            //READ
+                            DatagramChannel ch = (DatagramChannel) sk.channel();
+                            ReadResult readResult = read(ch);
+                            //PROCEED
+                            SocketAddress curAdr = readResult.getAddress();
+                            byte[] message = readResult.getMessage();
+                            proceed(message, curAdr, sk);
                         }
-                        AttachedObject curObj = new AttachedObject(curAdr, answer);
-                        sock.configureBlocking(false);
-                        SelectionKey newKey = sock.register(sk.selector(), SelectionKey.OP_WRITE);
-                        newKey.attach(curObj);
-                    }
-                    if (sk.isWritable()) {
-                        //WRITE
-                        ByteArrayOutputStream byteArray = new ByteArrayOutputStream(buffSize);
-                        ObjectOutputStream objectArray = new ObjectOutputStream(byteArray);
-                        objectArray.writeObject(((AttachedObject) sk.attachment()).getAnswer());
-                        byte[] answerByte = byteArray.toByteArray();
-                        if (answerByte.length > buffSize){
-                            byte[] answerByte1 = new byte[buffSize];
-                            for (int i = 0; i < buffSize;i++){
-                                answerByte1[i] = answerByte[i];
-                            }
-                            answerByte = answerByte1;
+                        if (sk.isWritable()) {
+                            //WRITE
+                            sk.interestOpsAnd(~SelectionKey.OP_WRITE);
+                            Runnable writeTask = () -> write(sk);
+                            service.submit(writeTask);
                         }
-                        ByteBuffer bufferAnswer = ByteBuffer.wrap(answerByte);
-                        bufferAnswer.clear();
-                        DatagramChannel sock = (DatagramChannel) sk.channel();
-                        sock.send(bufferAnswer, ((AttachedObject) sk.attachment()).getAdr());
-                        sock.configureBlocking(false);
-                        sock.register(sk.selector(), SelectionKey.OP_READ);
-                        logger.info("Answer send back.");
                     }
                 }
-                it.remove();
             }
         } catch (SocketException e){
             System.out.println("Socket exception.");
-            e.printStackTrace();
         } catch (IOException e){
             System.out.println("IOException.");
-            e.printStackTrace();
+        }
+    }
+
+    private static void write(SelectionKey sk){
+        try {
+            ByteArrayOutputStream byteArray = new ByteArrayOutputStream(buffSize);
+            ObjectOutputStream objectArray = new ObjectOutputStream(byteArray);
+            objectArray.writeObject(((AttachedObject) sk.attachment()).getAnswer());
+            byte[] answerByte = byteArray.toByteArray();
+            if (answerByte.length > buffSize) {
+                byte[] answerByte1 = new byte[buffSize];
+                for (int i = 0; i < buffSize; i++) {
+                    answerByte1[i] = answerByte[i];
+                }
+                answerByte = answerByte1;
+            }
+            ByteBuffer bufferAnswer = ByteBuffer.wrap(answerByte);
+            bufferAnswer.clear();
+            DatagramChannel sock = (DatagramChannel) sk.channel();
+            sock.send(bufferAnswer, ((AttachedObject) sk.attachment()).getAdr());
+            sock.configureBlocking(false);
+            SelectionKey key = sock.register(sk.selector(), SelectionKey.OP_READ);
+            sk.selector().wakeup();
+            logger.info("Answer send back.");
+        } catch (SocketException e){
+            System.out.println("Socket exception.");
+        } catch (IOException e){
+            System.out.println("IOException.");
+        }
+    }
+
+    private static ReadResult read(DatagramChannel channel){
+        byte[] message = new byte[buffSize];
+        ByteBuffer buffer = ByteBuffer.wrap(message);
+        buffer.clear();
+        try {
+            SocketAddress address = channel.receive(buffer);
+            return new ReadResult(address, message);
+        } catch (IOException e) {
+            System.out.println("IOException");
+            return null;
+        }
+    }
+
+    private static void proceed(byte[] message, SocketAddress curAdr, SelectionKey sk){
+        DatagramChannel ch = (DatagramChannel) sk.channel();
+        Message<String, ?> answer = new Message<>();
+        try {
+            answer = commandsMaster.executeCommand(message);
+            if (answer.getArg().length() > buffSize){
+                answer.setArg(answer.getArg().substring(0, buffSize - 1000));
+            }
+        } catch (RecursionInFileException e) {
+            answer.setArg("Recursion in file spotted.");
+        }
+        AttachedObject curObj = new AttachedObject(curAdr, answer);
+        try {
+            ch.configureBlocking(false);
+            ch.register(sk.selector(), SelectionKey.OP_WRITE, curObj);
+        } catch (IOException e){
+            System.out.println("IOException.");
         }
     }
 }
