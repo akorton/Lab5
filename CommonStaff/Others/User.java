@@ -12,7 +12,7 @@ public class User implements Serializable {
     private byte[] encodedPassword;
     private String password;
     private String salt;
-    private static String pepper = "!ajsld826?>{";
+    private static final String pepper = "!ajsld826?>{";
 
     public User(String name, String password) throws PasswordGenerationException {
         this.name = name;

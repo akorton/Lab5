@@ -30,12 +30,6 @@ public class CM3 {
         } catch (UnknownHostException e){
             System.out.println("Unknown host.");
         }
-//        ConsoleInputMaster consoleInputMaster = new ConsoleInputMaster(new Scanner(System.in));
-//        try {
-//            consoleInputMaster.run();
-//        } catch (NullPointerException e){
-//            System.out.println("You have not been authorized.\nPls try again.");
-//        }
         try {
             User user1 = new User("name3", "password3");
             Message<User, ?> message = new Message<>(CommandTypes.LOGIN);
@@ -45,13 +39,10 @@ public class CM3 {
             e.printStackTrace();
         }
         sendInfo(new Message<>(CommandTypes.CLEAR));
-        sendInfo(new Message<>(CommandTypes.CLEAR));
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < TestModule.num; i++) {
             sendInfo(new Message<>(CommandTypes.EXECUTE_SCRIPT, "src\\Lab5\\Server\\Files\\script1"));
             System.out.println("Request #" + (i + 1) + " in thread3 finished.");
         }
-        sendInfo(new Message<>(CommandTypes.CLEAR));
-        sendInfo(new Message<>(CommandTypes.CLEAR));
 
         System.out.println(System.currentTimeMillis() - start_time);
     }

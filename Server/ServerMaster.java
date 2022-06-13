@@ -11,9 +11,6 @@ import java.nio.channels.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.*;
 
 public class ServerMaster {
@@ -84,14 +81,14 @@ public class ServerMaster {
                                     return read(sk);
                                 }
                             };
-                            readPool.invoke(readTask);
+                            readPool.execute(readTask);
                             //PROCEED
                             ForkJoinTask<Void> proceedTask = new RecursiveAction() {
                                 protected void compute() {
                                     proceed(readTask, sk);
                                 }
                             };
-                            proceedPool.invoke(proceedTask);
+                            proceedPool.execute(proceedTask);
                         }
                         if (sk.isWritable()) {
                             //WRITE
@@ -126,7 +123,6 @@ public class ServerMaster {
             bufferAnswer.clear();
             DatagramChannel sock = (DatagramChannel) sk.channel();
             sock.send(bufferAnswer, ((AttachedObject) sk.attachment()).getAdr());
-            sock.configureBlocking(false);
             sock.register(sk.selector(), SelectionKey.OP_READ);
             logger.info("Answer send back.");
         } catch (SocketException e){
@@ -174,7 +170,6 @@ public class ServerMaster {
                 answer.setArg("Recursion in file spotted.");
             }
             AttachedObject curObj = new AttachedObject(curAdr, answer);
-            ch.configureBlocking(false);
             ch.register(sk.selector(), SelectionKey.OP_WRITE, curObj);
         }catch (IOException e){
             System.out.println("IOException.");

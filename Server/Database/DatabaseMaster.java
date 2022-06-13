@@ -3,6 +3,7 @@ package Lab5.Server.Database;
 import Lab5.CommonStaff.CollectionStaff.*;
 import Lab5.CommonStaff.Others.User;
 
+import java.io.File;
 import java.sql.*;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -12,10 +13,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DatabaseMaster {
     private static Connection con;
     private static Statement statement;
-    private static String localUrl = "jdbc:postgresql://localhost:5432/studs";
-    private static String heliosUrl = "jdbc:postgresql://pg:5432/studs";
+    private static String localUrl;
+    private static String heliosUrl;
     private static DatabaseMaster databaseMaster = new DatabaseMaster();
-    private static final Lock lock = new ReentrantLock();
+    private static final Lock lockCollection = new ReentrantLock();
+    private static final Lock lockUsers = new ReentrantLock();
 
     private DatabaseMaster(){
     }
@@ -26,9 +28,13 @@ public class DatabaseMaster {
 
     public static boolean setUp(){
         try {
+            Locale locale = new Locale("en", "EN");
+            ResourceBundle bundle = ResourceBundle.getBundle("\\Lab5\\Server\\Database\\database", locale);
             Properties properties = new Properties();
-            properties.setProperty("user", "s336667");
-            properties.setProperty("password", "jto371");
+            properties.setProperty("user", bundle.getString("username"));
+            properties.setProperty("password", bundle.getString("password"));
+            localUrl = bundle.getString("localUrl");
+            heliosUrl = bundle.getString("heliosUrl");
             Class.forName("org.postgresql.Driver");
             con = DriverManager.getConnection(localUrl, properties);
             String createTableUsers = "CREATE TABLE IF not EXISTS users"+
@@ -74,7 +80,7 @@ public class DatabaseMaster {
     public Map<Integer, User> getIdToUsersTable() throws SQLException {
         String getTable = "SELECT * FROM users";
         Map<Integer, User> users = new HashMap<>();
-        lock.lock();
+        lockUsers.lock();
         try (ResultSet answer = statement.executeQuery(getTable)){
             while (answer.next()){
                 int id = answer.getInt("id");
@@ -85,7 +91,7 @@ public class DatabaseMaster {
                 users.put(id, user);
             }
         } finally {
-            lock.unlock();
+            lockUsers.unlock();
         }
         return users;
     }
@@ -93,7 +99,7 @@ public class DatabaseMaster {
     private Map<User, Integer> getUserToIdTable() throws SQLException {
         String getTable = "SELECT * FROM users";
         Map<User, Integer> users = new HashMap<>();
-        lock.lock();
+        lockUsers.lock();
         try (ResultSet answer = statement.executeQuery(getTable)) {
             while (answer.next()) {
                 int id = answer.getInt("id");
@@ -104,7 +110,7 @@ public class DatabaseMaster {
                 users.put(user, id);
             }
         } finally {
-            lock.unlock();
+            lockUsers.unlock();
         }
         return users;
     }
@@ -118,7 +124,7 @@ public class DatabaseMaster {
     public LinkedList<City> getCollectionTable() throws SQLException {
         String getTable = "SELECT * FROM collection";
         LinkedList<City> collection = new LinkedList<>();
-        lock.lock();
+        lockCollection.lock();
         try (ResultSet answer = statement.executeQuery(getTable);) {
             while (answer.next()) {
                 long id = answer.getLong("id");
@@ -142,14 +148,14 @@ public class DatabaseMaster {
                 collection.add(city);
             }
         } finally {
-            lock.unlock();
+            lockCollection.unlock();
         }
         return collection;
     }
 
     public static int getNextUserId() throws SQLException{
         String nextId = "SELECT nextval('userid')";
-        lock.lock();
+        lockUsers.lock();
         try {
             ResultSet res = statement.executeQuery(nextId);
             res.next();
@@ -157,14 +163,14 @@ public class DatabaseMaster {
             res.close();
             return ans;
         } finally {
-            lock.unlock();
+            lockUsers.unlock();
         }
     }
 
 
     public static long getNextCollectionId() throws SQLException{
         String nextId = "SELECT nextval('collectionid');";
-        lock.lock();
+        lockCollection.lock();
         try {
             ResultSet res = statement.executeQuery(nextId);
             res.next();
@@ -172,7 +178,7 @@ public class DatabaseMaster {
             res.close();
             return ans;
         } finally {
-            lock.unlock();
+            lockCollection.unlock();
         }
     }
 
@@ -183,13 +189,13 @@ public class DatabaseMaster {
         statement1.setString(2, user.getName());
         statement1.setBytes(3, user.getEncodedPassword());
         statement1.setString(4, user.getSalt());
-        lock.lock();
+        lockUsers.lock();
         try {
             int result = statement1.executeUpdate();
             return result != 0;
         } finally {
             statement1.close();
-            lock.unlock();
+            lockUsers.unlock();
         }
     }
 
@@ -211,13 +217,13 @@ public class DatabaseMaster {
         statement1.setInt(12, city.getGovernor().getAge());
         statement1.setString(13, city.getGovernor().getBirthday().toString());
         statement1.setInt(14, city.getUserId());
-        lock.lock();
+        lockCollection.lock();
         try {
             int result = statement1.executeUpdate();
             return result != 0;
         } finally {
             statement1.close();
-            lock.unlock();
+            lockCollection.unlock();
         }
     }
 
@@ -245,18 +251,18 @@ public class DatabaseMaster {
         String deleteCity = "DELETE from collection WHERE id = ?";
         PreparedStatement st = con.prepareStatement(deleteCity);
         st.setLong(1, id);
-        lock.lock();
+        lockCollection.lock();
         try {
             int result = st.executeUpdate();
             return result != 0;
         } finally {
             st.close();
-            lock.unlock();
+            lockCollection.unlock();
         }
     }
 
     public boolean removeAll(Collection<City> cities) throws SQLException{
-        lock.lock();
+        lockCollection.lock();
         try {
             for (City city : cities) {
                 if (!removeCityById(city.getId())) {
@@ -265,7 +271,7 @@ public class DatabaseMaster {
             }
             return true;
         } finally {
-            lock.unlock();
+            lockCollection.unlock();
         }
     }
 
@@ -287,13 +293,13 @@ public class DatabaseMaster {
         statement1.setInt(11, newCity.getGovernor().getAge());
         statement1.setString(12,newCity.getGovernor().getBirthday().toString());
         statement1.setLong(13, id);
-        lock.lock();
+        lockCollection.lock();
         try {
             int result = statement1.executeUpdate();
             return result != 0;
         } finally {
             statement1.close();
-            lock.unlock();
+            lockCollection.unlock();
         }
     }
 }

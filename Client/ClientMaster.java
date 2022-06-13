@@ -25,7 +25,6 @@ public class ClientMaster {
     private static final int buffSize = 32000;
 
     public static void main(String[] args){
-        long start_time = System.currentTimeMillis();
         try {
             socketAddress = new InetSocketAddress(InetAddress.getLocalHost(), port);
         } catch (UnknownHostException e){
@@ -37,24 +36,6 @@ public class ClientMaster {
         } catch (NullPointerException e){
             System.out.println("You have not been authorized.\nPls try again.");
         }
-//        try {
-//            User user1 = new User("name", "password");
-//            Message<User, ?> message = new Message<>(CommandTypes.LOGIN);
-//            message.setArg(user1);
-//            sendInfo(message);
-//        } catch (PasswordGenerationException e) {
-//            e.printStackTrace();
-//        }
-//        sendInfo(new Message<>(CommandTypes.CLEAR));
-//        sendInfo(new Message<>(CommandTypes.CLEAR));
-//        for (int i = 0; i < 25; i++) {
-//            sendInfo(new Message<>(CommandTypes.EXECUTE_SCRIPT, "src\\Lab5\\Server\\Files\\script1"));
-//            System.out.println("Request #" + (i + 1) + " in thread0 finished.");
-//        }
-//        sendInfo(new Message<>(CommandTypes.CLEAR));
-//        sendInfo(new Message<>(CommandTypes.CLEAR));
-//
-//        System.out.println(System.currentTimeMillis() - start_time);
     }
 
     public static Message<String, ?> sendInfo(Message<?, ?> message){
